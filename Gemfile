@@ -50,3 +50,7 @@ gem 'rest-client'
 
 # In case of need for serializing json output to Frontend
 gem 'active_model_serializers'
+
+gem "jwt", "~> 2.1"
+
+gem "faker", "~> 1.9"
