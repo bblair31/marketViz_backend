@@ -3,7 +3,13 @@ class Api::V1::TransactionsController < ApplicationController
   before_action :find_transaction, only [:destroy]
 
   def create
-    ##### need to Stock.find_or_create_by
+    @stock = Stock.find_or_create_by(iex_id: params[:iex_id]) do |stock|
+      stock.company_name = params[:company_name]
+      stock.symbol = params[:symbol]
+    end
+
+    params[:stock_id] = @stock.id
+
     @transaction = Transaction.create(transaction_params)
     if @transaction.valid?
      render json: @transaction, status: :created
