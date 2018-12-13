@@ -3,7 +3,7 @@ class CreateTransactions < ActiveRecord::Migration[5.2]
     create_table :transactions do |t|
       t.integer :user_id
       t.integer :stock_id
-      t.integer :priceBought
+      t.integer :price_bought
 
       t.timestamps
     end
