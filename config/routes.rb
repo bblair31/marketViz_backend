@@ -7,7 +7,7 @@ Rails.application.routes.draw do
      post '/login', to: 'auth#create'
      get '/profile', to: 'users#profile'
      get '/fetchstocks', to: 'stocks#fetch_stocks'
-     
+
      ### All passthrough requests to 3rd Party API
      get '/markets', to: 'apis#markets'
      get '/mostactive', to: 'apis#most_active'
@@ -17,6 +17,7 @@ Rails.application.routes.draw do
      get '/sectorperformance', to: 'apis#sector_performance'
      get '/infocus', to: 'apis#in_focus'
      get '/earningstoday', to: 'apis#earnings_today'
+     get '/iposcalendar', to: 'apis#ipos_calendar'
    end
  end
 end

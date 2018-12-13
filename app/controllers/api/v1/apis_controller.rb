@@ -43,4 +43,9 @@ class Api::V1::ApisController < ApplicationController
     render json: @earnings_today
   end
 
+  def ipos_calendar
+    @ipos_calendar = RestClient.get "#{BASE_URL}/stock/market/upcoming-ipos"
+    render json: @ipos_calendar
+  end
+
 end ### End of API Controller
