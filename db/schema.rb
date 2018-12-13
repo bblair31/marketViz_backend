@@ -25,6 +25,7 @@ ActiveRecord::Schema.define(version: 2018_12_12_213610) do
   create_table "stocks", force: :cascade do |t|
     t.string "symbol"
     t.string "company_name"
+    t.integer "iex_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -32,7 +33,7 @@ ActiveRecord::Schema.define(version: 2018_12_12_213610) do
   create_table "transactions", force: :cascade do |t|
     t.integer "user_id"
     t.integer "stock_id"
-    t.integer "priceBought"
+    t.integer "price_bought"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
