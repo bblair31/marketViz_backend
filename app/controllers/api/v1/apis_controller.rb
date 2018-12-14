@@ -48,4 +48,34 @@ class Api::V1::ApisController < ApplicationController
     render json: @ipos_today
   end
 
+  def chart
+    @chart = RestClient.get "#{BASE_URL}/stock/#{params[:symbol]}/chart/#{params[:timeframe]}"
+    render json: @chart
+  end
+
+  def quote
+    @quote = RestClient.get "#{BASE_URL}/stock/#{params[:symbol]}/quote"
+    render json: @quote
+  end
+
+  def peers
+    @peers = RestClient.get "#{BASE_URL}/stock/#{params[:symbol]}/peers"
+    render json: @peers
+  end
+
+  def news
+    @news = RestClient.get "#{BASE_URL}/stock/#{params[:symbol]}/news/last/50"
+    render json: @news
+  end
+
+  def logo
+    @company_info = RestClient.get "#{BASE_URL}/stock/#{params[:symbol]}/company"
+    render json: @company_info
+  end
+
+  def logo
+    @logo = RestClient.get "#{BASE_URL}/stock/#{params[:symbol]}/logo"
+    render json: @logo
+  end
+
 end ### End of API Controller

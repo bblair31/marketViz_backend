@@ -18,6 +18,13 @@ Rails.application.routes.draw do
      get '/infocus', to: 'apis#in_focus'
      get '/earningstoday', to: 'apis#earnings_today'
      get '/ipostoday', to: 'apis#ipos_today'
+     get '/chart/:symbol/:timeframe', to: 'apis#chart'
+     get '/quote/:symbol', to: 'apis#quote'
+     get '/peers/:symbol', to: 'apis#peers'
+     get '/news/:symbol', to: 'apis#news'
+     get '/financials/:symbol', to: 'apis#financials'
+     get '/companyinfo/:symbol', to: 'apis#company_info'
+     get '/logo/:symbol', to: 'apis#logo'
    end
  end
 end
