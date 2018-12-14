@@ -17,7 +17,7 @@ Rails.application.routes.draw do
      get '/sectorperformance', to: 'apis#sector_performance'
      get '/infocus', to: 'apis#in_focus'
      get '/earningstoday', to: 'apis#earnings_today'
-     get '/iposcalendar', to: 'apis#ipos_calendar'
+     get '/ipostoday', to: 'apis#ipos_today'
    end
  end
 end
