@@ -25,6 +25,7 @@ Rails.application.routes.draw do
      get '/financials/:symbol', to: 'apis#financials'
      get '/companyinfo/:symbol', to: 'apis#company_info'
      get '/logo/:symbol', to: 'apis#logo'
+     get '/earnings/:symbol', to: 'apis#earnings'
    end
  end
 end

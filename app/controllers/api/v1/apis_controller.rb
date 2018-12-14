@@ -68,7 +68,12 @@ class Api::V1::ApisController < ApplicationController
     render json: @news
   end
 
-  def logo
+  def financials
+    @financials = RestClient.get "#{BASE_URL}/stock/#{params[:symbol]}/financials"
+    render json: @financials
+  end
+
+  def company_info
     @company_info = RestClient.get "#{BASE_URL}/stock/#{params[:symbol]}/company"
     render json: @company_info
   end
@@ -76,6 +81,11 @@ class Api::V1::ApisController < ApplicationController
   def logo
     @logo = RestClient.get "#{BASE_URL}/stock/#{params[:symbol]}/logo"
     render json: @logo
+  end
+
+  def earnings
+    @earnings = RestClient.get "#{BASE_URL}/stock/#{params[:symbol]}/earnings"
+    render json: @earnings
   end
 
 end ### End of API Controller
