@@ -59,7 +59,14 @@ class Api::V1::ApisController < ApplicationController
   end
 
   def peers
-    @peers = RestClient.get "#{BASE_URL}/stock/#{params[:symbol]}/peers"
+    peers = JSON.parse(RestClient.get "#{BASE_URL}/stock/#{params[:symbol]}/peers")
+    if peers.length > 0
+      @peers = peers.map do |peer|
+        JSON.parse(RestClient.get "#{BASE_URL}/stock/#{peer}/quote")
+      end
+    else
+      @peers = peers
+    end
     render json: @peers
   end
 
@@ -86,6 +93,11 @@ class Api::V1::ApisController < ApplicationController
   def earnings
     @earnings = RestClient.get "#{BASE_URL}/stock/#{params[:symbol]}/earnings"
     render json: @earnings
+  end
+
+  def key_stats
+    @key_stats = RestClient.get "#{BASE_URL}/stock/#{params[:symbol]}/stats"
+    render json: @key_stats
   end
 
 end ### End of API Controller

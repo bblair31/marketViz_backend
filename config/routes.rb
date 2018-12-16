@@ -26,6 +26,7 @@ Rails.application.routes.draw do
      get '/companyinfo/:symbol', to: 'apis#company_info'
      get '/logo/:symbol', to: 'apis#logo'
      get '/earnings/:symbol', to: 'apis#earnings'
+     get '/keystats/:symbol', to: 'apis#key_stats'
    end
  end
 end
