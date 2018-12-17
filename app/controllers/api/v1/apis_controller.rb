@@ -24,7 +24,7 @@ class Api::V1::ApisController < ApplicationController
   end
 
   def market_news
-    @market_news = RestClient.get "#{BASE_URL}/stock/market/news/last/50"
+    @market_news = RestClient.get "#{BASE_URL}/stock/market/batch?symbols=spy&types=news&last=50"
     render json: @market_news
   end
 
