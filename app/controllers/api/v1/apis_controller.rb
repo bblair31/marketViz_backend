@@ -48,6 +48,11 @@ class Api::V1::ApisController < ApplicationController
     render json: @ipos_today
   end
 
+  def stock_dictionary
+    @stock_dictionary = RestClient.get "#{BASE_URL}/ref-data/symbols"
+    render json: @stock_dictionary
+  end
+
   def chart
     @chart = RestClient.get "#{BASE_URL}/stock/#{params[:symbol]}/chart/#{params[:timeframe]}"
     render json: @chart
