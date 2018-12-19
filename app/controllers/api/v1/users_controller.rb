@@ -1,5 +1,5 @@
 class Api::V1::UsersController < ApplicationController
-  skip_before_action :authorized, only: %i[create]
+  skip_before_action :authorized, only: [:create, :stocks]
   wrap_parameters :user, include: [:username, :password, :email]
 
   def profile
@@ -15,6 +15,10 @@ class Api::V1::UsersController < ApplicationController
     else
      render json: { error: 'failed to create user' }, status: :not_acceptable
     end
+  end
+
+  def stocks
+    byebug
   end
 
 

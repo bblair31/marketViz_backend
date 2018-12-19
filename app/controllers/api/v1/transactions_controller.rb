@@ -4,9 +4,9 @@ class Api::V1::TransactionsController < ApplicationController
   wrap_parameters :transaction, include: [:user_id, :stock_id, :price_bought]
 
   def create
-    @stock = Stock.find_or_create_by(iex_id: params[:iex_id]) do |stock|
+    @stock = Stock.find_or_create_by(symbol: params[:symbol]) do |stock|
       stock.company_name = params[:company_name]
-      stock.symbol = params[:symbol]
+      stock.iex_id = params[:iex_id]
     end
 
     @user = User.find_by(username: params[:username])
@@ -15,8 +15,9 @@ class Api::V1::TransactionsController < ApplicationController
 
     @transaction = Transaction.create(user_id: @user.id, stock_id: params[:stock_id], price_bought: params[:price_bought])
 
+    @stocks = @user.stocks.uniq
     if @transaction.valid?
-     render json: @transaction, status: :created
+     render json: @stocks, status: :created
     else
      render json: { error: 'failed to create transaction' }, status: :not_acceptable
     end
