@@ -17,8 +17,8 @@ class Api::V1::UsersController < ApplicationController
     end
   end
 
-  def stocks
-    byebug
+  def portfolio
+    render json: { user: current_user.stocks.uniq }, status: :accepted
   end
 
 

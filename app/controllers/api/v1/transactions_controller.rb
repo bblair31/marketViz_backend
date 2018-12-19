@@ -9,15 +9,10 @@ class Api::V1::TransactionsController < ApplicationController
       stock.iex_id = params[:iex_id]
     end
 
-    @user = User.find_by(username: params[:username])
+    @transaction = Transaction.create(user_id: current_user.id, stock_id: @stock.id, price_bought: params[:price_bought])
 
-    params[:stock_id] = @stock.id
-
-    @transaction = Transaction.create(user_id: @user.id, stock_id: params[:stock_id], price_bought: params[:price_bought])
-
-    @stocks = @user.stocks.uniq
     if @transaction.valid?
-     render json: @stocks, status: :created
+     render json: @transaction, status: :created
     else
      render json: { error: 'failed to create transaction' }, status: :not_acceptable
     end
