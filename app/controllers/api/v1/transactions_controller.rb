@@ -1,6 +1,7 @@
 class Api::V1::TransactionsController < ApplicationController
-  # skip_before_action :authorized, only: [:create]
-  before_action :find_transaction, only [:destroy]
+  skip_before_action :authorized, only: [:create, :destroy]
+  before_action :find_transaction, only: [:destroy]
+  wrap_parameters :transaction, include: [:user_id, :stock_id, :price_bought]
 
   def create
     @stock = Stock.find_or_create_by(iex_id: params[:iex_id]) do |stock|
@@ -8,9 +9,12 @@ class Api::V1::TransactionsController < ApplicationController
       stock.symbol = params[:symbol]
     end
 
+    @user = User.find_by(username: params[:username])
+
     params[:stock_id] = @stock.id
 
-    @transaction = Transaction.create(transaction_params)
+    @transaction = Transaction.create(user_id: @user.id, stock_id: params[:stock_id], price_bought: params[:price_bought])
+
     if @transaction.valid?
      render json: @transaction, status: :created
     else

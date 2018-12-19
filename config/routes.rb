@@ -6,7 +6,6 @@ Rails.application.routes.draw do
      resources :transactions, only: [:create, :destroy]
      post '/login', to: 'auth#create'
      get '/profile', to: 'users#profile'
-     get '/fetchstocks', to: 'stocks#fetch_stocks'
 
      ### All passthrough requests to 3rd Party API
      get '/markets', to: 'apis#markets'

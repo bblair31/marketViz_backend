@@ -1,5 +1,6 @@
 class Api::V1::AuthController < ApplicationController
-  skip_before_action :authorized, only: [:create]
+  skip_before_action :authorized, only: %i[create]
+  wrap_parameters :user, include: [:username, :password]
 
   def create
     @user = User.find_by(username: user_login_params[:username])
@@ -17,5 +18,5 @@ private
   def user_login_params
     params.require(:user).permit(:username, :password)
   end
-  
+
 end ### End of AuthController

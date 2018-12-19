@@ -2,7 +2,8 @@ BASE_URL = 'https://api.iextrading.com/1.0'
 
 
 class Api::V1::ApisController < ApplicationController
-
+  skip_before_action :authorized
+  
   def markets
     @markets = RestClient.get "#{BASE_URL}/market"
     render json: @markets
