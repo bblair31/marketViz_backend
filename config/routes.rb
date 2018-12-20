@@ -6,7 +6,10 @@ Rails.application.routes.draw do
      resources :transactions, only: [:create, :destroy]
      post '/login', to: 'auth#create'
      get '/profile', to: 'users#profile'
-     get '/portfolio', to: 'users#portfolio'
+     get '/watchlist', to: 'users#watchlist'
+     get '/watchlistnews', to: 'users#watchlist_news'
+     get '/watchlistpeers', to: 'users#watchlist_peers'
+     get '/watchlistcharts/:timeframe', to: 'users#watchlist_charts'
 
      ### All passthrough requests to 3rd Party API
      get '/markets', to: 'apis#markets'

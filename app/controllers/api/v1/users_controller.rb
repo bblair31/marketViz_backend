@@ -17,8 +17,37 @@ class Api::V1::UsersController < ApplicationController
     end
   end
 
-  def portfolio
-    render json: { user: current_user.stocks.uniq }, status: :accepted
+  def watchlist
+    @watchlist = current_user.stocks.uniq.map do |stock|
+      JSON.parse(RestClient.get "https://api.iextrading.com/1.0/stock/#{stock.symbol}/quote")
+    end
+    render json: @watchlist, status: :accepted
+  end
+
+  def watchlist_news
+    news = current_user.stocks.uniq.map do |stock|
+      JSON.parse(RestClient.get "https://api.iextrading.com/1.0/stock/#{stock.symbol}/news/last/20")
+    end
+    @watchlist_news = news.flatten.sort_by{ |news| news["datetime"]}.reverse
+
+    render json: @watchlist_news, status: :accepted
+  end
+
+  def watchlist_peers
+    peers = current_user.stocks.uniq.map do |stock|
+      JSON.parse(RestClient.get "#{BASE_URL}/stock/#{stock.symbol}/peers")
+    end
+    @watchlist_peers = peers.flatten.map do |peer|
+      JSON.parse(RestClient.get "#{BASE_URL}/stock/#{peer}/quote")
+    end
+    render json: @watchlist_peers
+  end
+
+  def watchlist_charts
+    @watchlist_charts = current_user.stocks.uniq.map do |stock|
+      JSON.parse(RestClient.get "#{BASE_URL}/stock/#{stock.symbol}/chart/#{params[:timeframe]}")
+    end
+    render json: @watchlist_charts
   end
 
 
