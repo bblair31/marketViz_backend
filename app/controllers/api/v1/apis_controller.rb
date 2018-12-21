@@ -64,6 +64,11 @@ class Api::V1::ApisController < ApplicationController
     render json: @quote
   end
 
+  def crypto
+    @crypto = RestClient.get "#{BASE_URL}/stock/market/crypto"
+    render json: @crypto
+  end
+
   def peers
     peers = JSON.parse(RestClient.get "#{BASE_URL}/stock/#{params[:symbol]}/peers")
     if peers.length > 0

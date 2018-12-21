@@ -9,7 +9,6 @@ Rails.application.routes.draw do
      get '/watchlist', to: 'users#watchlist'
      get '/watchlistnews', to: 'users#watchlist_news'
      get '/watchlistpeers', to: 'users#watchlist_peers'
-     get '/watchlistcharts/:timeframe', to: 'users#watchlist_charts'
 
      ### All passthrough requests to 3rd Party API
      get '/markets', to: 'apis#markets'
@@ -21,6 +20,7 @@ Rails.application.routes.draw do
      get '/infocus', to: 'apis#in_focus'
      get '/earningstoday', to: 'apis#earnings_today'
      get '/ipostoday', to: 'apis#ipos_today'
+     get '/crypto', to: 'apis#crypto'
      get '/chart/:symbol/:timeframe', to: 'apis#chart'
      get '/quote/:symbol', to: 'apis#quote'
      get '/peers/:symbol', to: 'apis#peers'
