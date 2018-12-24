@@ -3,7 +3,7 @@ Rails.application.routes.draw do
    namespace :v1 do
      resources :users, only: [:create]
      resources :search, only: [:create]
-     resources :transactions, only: [:create, :destroy]
+     resources :transactions, only: [:create]
      post '/login', to: 'auth#create'
      get '/profile', to: 'users#profile'
      get '/watchlist', to: 'users#watchlist'
@@ -31,6 +31,7 @@ Rails.application.routes.draw do
      get '/earnings/:symbol', to: 'apis#earnings'
      get '/keystats/:symbol', to: 'apis#key_stats'
      get '/stockdictionary', to: 'apis#stock_dictionary'
+     delete '/transactions/:symbol', to: 'transactions#destroy'
    end
  end
 end
