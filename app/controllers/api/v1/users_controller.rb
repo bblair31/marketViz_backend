@@ -43,14 +43,6 @@ class Api::V1::UsersController < ApplicationController
     render json: @watchlist_peers
   end
 
-  def watchlist_charts
-    @watchlist_charts = current_user.stocks.uniq.map do |stock|
-      JSON.parse(RestClient.get "#{BASE_URL}/stock/#{stock.symbol}/chart/#{params[:timeframe]}")
-    end
-    render json: @watchlist_charts
-  end
-
-
 private
 
   def user_params

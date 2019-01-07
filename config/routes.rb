@@ -3,13 +3,12 @@ Rails.application.routes.draw do
    namespace :v1 do
      resources :users, only: [:create]
      resources :search, only: [:create]
-     resources :transactions, only: [:create, :destroy]
+     resources :transactions, only: [:create]
      post '/login', to: 'auth#create'
      get '/profile', to: 'users#profile'
      get '/watchlist', to: 'users#watchlist'
      get '/watchlistnews', to: 'users#watchlist_news'
      get '/watchlistpeers', to: 'users#watchlist_peers'
-     get '/watchlistcharts/:timeframe', to: 'users#watchlist_charts'
 
      ### All passthrough requests to 3rd Party API
      get '/markets', to: 'apis#markets'
@@ -21,6 +20,7 @@ Rails.application.routes.draw do
      get '/infocus', to: 'apis#in_focus'
      get '/earningstoday', to: 'apis#earnings_today'
      get '/ipostoday', to: 'apis#ipos_today'
+     get '/crypto', to: 'apis#crypto'
      get '/chart/:symbol/:timeframe', to: 'apis#chart'
      get '/quote/:symbol', to: 'apis#quote'
      get '/peers/:symbol', to: 'apis#peers'
@@ -31,6 +31,7 @@ Rails.application.routes.draw do
      get '/earnings/:symbol', to: 'apis#earnings'
      get '/keystats/:symbol', to: 'apis#key_stats'
      get '/stockdictionary', to: 'apis#stock_dictionary'
+     delete '/transactions/:symbol', to: 'transactions#destroy'
    end
  end
 end

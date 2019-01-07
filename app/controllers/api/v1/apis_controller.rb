@@ -5,7 +5,7 @@ class Api::V1::ApisController < ApplicationController
   skip_before_action :authorized
 
   def markets
-    @markets = RestClient.get "#{BASE_URL}/market"
+    @markets = RestClient.get "#{BASE_URL}/stock/market/batch?symbols=dia,spy,iwm&types=quote"
     render json: @markets
   end
 
@@ -62,6 +62,11 @@ class Api::V1::ApisController < ApplicationController
   def quote
     @quote = RestClient.get "#{BASE_URL}/stock/#{params[:symbol]}/quote"
     render json: @quote
+  end
+
+  def crypto
+    @crypto = RestClient.get "#{BASE_URL}/stock/market/crypto"
+    render json: @crypto
   end
 
   def peers

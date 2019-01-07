@@ -1,6 +1,5 @@
 class Api::V1::TransactionsController < ApplicationController
   skip_before_action :authorized, only: [:create, :destroy]
-  before_action :find_transaction, only: [:destroy]
   wrap_parameters :transaction, include: [:user_id, :stock_id, :price_bought]
 
   def create
@@ -19,7 +18,11 @@ class Api::V1::TransactionsController < ApplicationController
   end
 
   def destroy
+    stock = Stock.find_by(symbol: params[:symbol])
+    @transaction = Transaction.find_by(stock_id: stock.id, user_id: current_user.id)
+
     @transaction.destroy
+    render json: { message: 'transaction deleted'}, status: :accepted
   end
 
 
@@ -29,7 +32,4 @@ private
     params.require(:transaction).permit(:id, :user_id, :stock_id, :price_bought)
   end
 
-  def find_transaction
-    @transaction = Transaction.find(params[:id])
-  end
 end ### End of TransactionController
