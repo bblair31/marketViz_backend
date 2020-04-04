@@ -22,12 +22,12 @@ These instructions will get you a copy of the project up and running on your loc
 1. Fork and clone this repository
 
 2. Install all required gems
- 
+
 ```
 bundle install
 ```
   * *NOTE*: If you get an error message about needing to install Bundler, from the command line run `gem install bundler`
-  
+
 3. Created new PostgreSQL development database
 
 ```
@@ -43,7 +43,7 @@ rails db:migrate
 5. Start the Rails Server
 
 ```
-rails start
+rails server
 ```
 6. Check to see if browser can communicate with the database
 
