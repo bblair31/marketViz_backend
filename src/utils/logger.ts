@@ -19,11 +19,25 @@ const logColors = {
 
 winston.addColors(logColors);
 
-const format = winston.format.combine(
+// Development format: colorized and human-readable
+const devFormat = winston.format.combine(
   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
   winston.format.colorize({ all: true }),
-  winston.format.printf((info) => `${info.timestamp} [${info.level}]: ${info.message}`)
+  winston.format.printf((info) => {
+    const { timestamp, level, message, ...meta } = info;
+    const metaStr = Object.keys(meta).length ? JSON.stringify(meta, null, 2) : '';
+    return `${timestamp} [${level}]: ${message} ${metaStr}`;
+  })
 );
+
+// Production format: JSON for log aggregation tools (e.g., ELK, Datadog)
+const prodFormat = winston.format.combine(
+  winston.format.timestamp(),
+  winston.format.errors({ stack: true }),
+  winston.format.json()
+);
+
+const format = config.isDevelopment ? devFormat : prodFormat;
 
 const transports = [
   new winston.transports.Console(),

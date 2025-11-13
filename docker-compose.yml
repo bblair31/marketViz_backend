@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:14-alpine
+    container_name: marketviz-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: marketviz
+      POSTGRES_PASSWORD: marketviz_dev_password
+      POSTGRES_DB: marketviz_development
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U marketviz']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: marketviz-api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://marketviz:marketviz_dev_password@postgres:5432/marketviz_development
+      JWT_SECRET: dev_jwt_secret_change_in_production_min_32_chars
+      ALPHA_VANTAGE_API_KEY: ${ALPHA_VANTAGE_API_KEY:-demo}
+      CORS_ORIGIN: http://localhost:3001,http://localhost:3000,http://localhost:5173
+      RATE_LIMIT_WINDOW_MS: 900000
+      RATE_LIMIT_MAX_REQUESTS: 100
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./logs:/app/logs
+    healthcheck:
+      test: ['CMD', 'node', '-e', "require('http').get('http://localhost:3000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1); })"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Prisma Studio (Database GUI)
+  prisma-studio:
+    image: node:18-alpine
+    container_name: marketviz-prisma-studio
+    working_dir: /app
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgresql://marketviz:marketviz_dev_password@postgres:5432/marketviz_development
+    command: sh -c "npm install -g prisma && prisma studio --browser none"
+    ports:
+      - '5555:5555'
+    volumes:
+      - ./prisma:/app/prisma
+    profiles:
+      - dev-tools
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  default:
+    name: marketviz-network
