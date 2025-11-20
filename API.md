@@ -10,6 +10,12 @@ Complete API reference for the MarketViz Backend.
 - [Authentication Endpoints](#authentication-endpoints)
 - [Watchlist Endpoints](#watchlist-endpoints)
 - [Market Data Endpoints](#market-data-endpoints)
+- [Economic Indicators Endpoints](#economic-indicators-endpoints)
+- [News Endpoints](#news-endpoints)
+- [Portfolio Endpoints](#portfolio-endpoints)
+- [Stock Screener Endpoints](#stock-screener-endpoints)
+- [Price Alerts Endpoints](#price-alerts-endpoints)
+- [WebSocket API](#websocket-api)
 
 ## Authentication
 
@@ -556,13 +562,981 @@ Get cryptocurrency exchange rate.
 }
 ```
 
+---
+
+### Technical Indicators
+
+All technical indicator endpoints follow this pattern. Query parameters: `interval` (daily/weekly/monthly), `period` (time period).
+
+#### Get Any Indicator
+
+**Endpoint**: `GET /api/v1/market/indicators/:symbol`
+
+**Query Parameters**:
+- `indicator`: Required (RSI, MACD, SMA, EMA, etc.)
+- `interval`: daily, weekly, monthly (default: daily)
+- `period`: Time period (default: 14)
+- `series_type`: close, open, high, low (default: close)
+
+#### Specific Indicator Endpoints
+
+- `GET /api/v1/market/indicators/:symbol/rsi` - Relative Strength Index
+- `GET /api/v1/market/indicators/:symbol/macd` - MACD (includes fast_period, slow_period, signal_period)
+- `GET /api/v1/market/indicators/:symbol/bbands` - Bollinger Bands (includes nbdevup, nbdevdn)
+- `GET /api/v1/market/indicators/:symbol/sma` - Simple Moving Average
+- `GET /api/v1/market/indicators/:symbol/ema` - Exponential Moving Average
+- `GET /api/v1/market/indicators/:symbol/adx` - Average Directional Index
+- `GET /api/v1/market/indicators/:symbol/stoch` - Stochastic Oscillator
+- `GET /api/v1/market/indicators/:symbol/atr` - Average True Range
+- `GET /api/v1/market/indicators/:symbol/obv` - On Balance Volume
+
+---
+
+### Fundamental Data Endpoints
+
+#### Get Income Statement
+
+**Endpoint**: `GET /api/v1/market/fundamentals/:symbol/income`
+
+Returns annual and quarterly income statements.
+
+---
+
+#### Get Balance Sheet
+
+**Endpoint**: `GET /api/v1/market/fundamentals/:symbol/balance`
+
+Returns annual and quarterly balance sheets.
+
+---
+
+#### Get Cash Flow
+
+**Endpoint**: `GET /api/v1/market/fundamentals/:symbol/cashflow`
+
+Returns annual and quarterly cash flow statements.
+
+---
+
+#### Get Earnings
+
+**Endpoint**: `GET /api/v1/market/fundamentals/:symbol/earnings`
+
+Returns annual and quarterly earnings data.
+
+---
+
+#### Get Earnings Calendar
+
+**Endpoint**: `GET /api/v1/market/calendar/earnings`
+
+**Query Parameters**:
+- `horizon`: 3month, 6month, 12month (default: 3month)
+
+---
+
+#### Get IPO Calendar
+
+**Endpoint**: `GET /api/v1/market/calendar/ipo`
+
+Returns upcoming IPOs.
+
+---
+
+### Forex Endpoints
+
+#### Get Exchange Rate
+
+**Endpoint**: `GET /api/v1/market/forex/rate`
+
+**Query Parameters**:
+- `from`: Source currency (required)
+- `to`: Target currency (required)
+
+Example: `GET /api/v1/market/forex/rate?from=EUR&to=USD`
+
+---
+
+#### Get Forex Daily
+
+**Endpoint**: `GET /api/v1/market/forex/daily`
+
+**Query Parameters**:
+- `from`: Source currency (required)
+- `to`: Target currency (required)
+- `outputsize`: compact or full (default: compact)
+
+---
+
+#### Get Forex Intraday
+
+**Endpoint**: `GET /api/v1/market/forex/intraday`
+
+**Query Parameters**:
+- `from`: Source currency (required)
+- `to`: Target currency (required)
+- `interval`: 1min, 5min, 15min, 30min, 60min (default: 5min)
+
+---
+
+#### Get Forex Weekly
+
+**Endpoint**: `GET /api/v1/market/forex/weekly`
+
+**Query Parameters**:
+- `from`: Source currency (required)
+- `to`: Target currency (required)
+
+---
+
+### Commodities Endpoints
+
+#### Get Commodity Data
+
+**Endpoint**: `GET /api/v1/market/commodities/:commodity`
+
+**URL Parameters**:
+- `commodity`: WTI, BRENT, NATURAL_GAS, COPPER, ALUMINUM, WHEAT, CORN, COTTON, SUGAR, COFFEE
+
+**Query Parameters**:
+- `interval`: daily, weekly, monthly (default: monthly)
+
+Example: `GET /api/v1/market/commodities/WTI?interval=daily`
+
+---
+
+## Economic Indicators Endpoints
+
+### Get Real GDP
+
+**Endpoint**: `GET /api/v1/economic/gdp`
+
+**Query Parameters**:
+- `interval`: annual or quarterly (default: annual)
+
+---
+
+### Get Treasury Yield
+
+**Endpoint**: `GET /api/v1/economic/treasury-yield`
+
+**Query Parameters**:
+- `interval`: daily, weekly, monthly (default: monthly)
+- `maturity`: 3month, 2year, 5year, 7year, 10year, 30year (default: 10year)
+
+---
+
+### Get Federal Funds Rate
+
+**Endpoint**: `GET /api/v1/economic/federal-funds-rate`
+
+**Query Parameters**:
+- `interval`: daily, weekly, monthly (default: monthly)
+
+---
+
+### Get CPI
+
+**Endpoint**: `GET /api/v1/economic/cpi`
+
+**Query Parameters**:
+- `interval`: monthly or semiannual (default: monthly)
+
+---
+
+### Get Inflation
+
+**Endpoint**: `GET /api/v1/economic/inflation`
+
+Returns annual inflation rate.
+
+---
+
+### Get Unemployment
+
+**Endpoint**: `GET /api/v1/economic/unemployment`
+
+Returns unemployment rate.
+
+---
+
+### Get Retail Sales
+
+**Endpoint**: `GET /api/v1/economic/retail-sales`
+
+Returns retail sales data.
+
+---
+
+### Get Nonfarm Payroll
+
+**Endpoint**: `GET /api/v1/economic/nonfarm-payroll`
+
+Returns nonfarm payroll data.
+
+---
+
+## News Endpoints
+
+News endpoints use Finnhub if configured, otherwise fall back to AlphaVantage.
+
+### Get Market News
+
+**Endpoint**: `GET /api/v1/news/market`
+
+**Query Parameters**:
+- `category`: general, forex, crypto, merger (default: general)
+
+---
+
+### Get Company News
+
+**Endpoint**: `GET /api/v1/news/company/:symbol`
+
+**Query Parameters**:
+- `from`: Start date YYYY-MM-DD (default: 7 days ago)
+- `to`: End date YYYY-MM-DD (default: today)
+
+---
+
+### Get News Sentiment
+
+**Endpoint**: `GET /api/v1/news/sentiment/:symbol`
+
+Returns sentiment analysis from both AlphaVantage and Finnhub (if configured).
+
+---
+
+### Get Social Sentiment
+
+**Endpoint**: `GET /api/v1/news/social/:symbol`
+
+Returns Reddit and Twitter mentions. **Requires Finnhub API key.**
+
+---
+
+### Get Insider Transactions
+
+**Endpoint**: `GET /api/v1/news/insider/:symbol`
+
+Returns insider trading activity. **Requires Finnhub API key.**
+
+---
+
+### Get Institutional Ownership
+
+**Endpoint**: `GET /api/v1/news/institutional/:symbol`
+
+Returns institutional holdings. **Requires Finnhub API key.**
+
+---
+
+### Get Market Status
+
+**Endpoint**: `GET /api/v1/news/market-status`
+
+**Query Parameters**:
+- `exchange`: Exchange code (default: US)
+
+**Requires Finnhub API key.**
+
+---
+
+## Portfolio Endpoints
+
+All portfolio endpoints require authentication.
+
+### Get Portfolio Summary
+
+Get portfolio summary with current values and gains/losses.
+
+**Endpoint**: `GET /api/v1/portfolio/summary`
+
+**Authentication**: Required
+
+**Success Response** (200):
+```json
+{
+  "status": "success",
+  "data": {
+    "holdings": [
+      {
+        "symbol": "AAPL",
+        "companyName": "Apple Inc.",
+        "quantity": 10,
+        "averageCost": 150.50,
+        "currentPrice": 182.50,
+        "currentValue": 1825.00,
+        "totalCost": 1505.00,
+        "gain": 320.00,
+        "gainPercent": 21.26
+      }
+    ],
+    "totalValue": 25000.00,
+    "totalCost": 20000.00,
+    "totalGain": 5000.00,
+    "totalGainPercent": 25.00
+  }
+}
+```
+
+---
+
+### Get Portfolio Metrics
+
+Get portfolio risk and performance metrics.
+
+**Endpoint**: `GET /api/v1/portfolio/metrics`
+
+**Authentication**: Required
+
+**Success Response** (200):
+```json
+{
+  "status": "success",
+  "data": {
+    "sharpeRatio": 1.45,
+    "standardDeviation": 0.18,
+    "beta": 1.12,
+    "alpha": 0.05,
+    "diversificationScore": 7.5
+  }
+}
+```
+
+---
+
+### Get Correlation Matrix
+
+Get correlation matrix between portfolio holdings.
+
+**Endpoint**: `GET /api/v1/portfolio/correlation`
+
+**Authentication**: Required
+
+**Success Response** (200):
+```json
+{
+  "status": "success",
+  "data": {
+    "symbols": ["AAPL", "MSFT", "GOOGL"],
+    "matrix": [
+      [1.0, 0.85, 0.78],
+      [0.85, 1.0, 0.82],
+      [0.78, 0.82, 1.0]
+    ]
+  }
+}
+```
+
+---
+
+### Get Performance History
+
+Get portfolio performance over time.
+
+**Endpoint**: `GET /api/v1/portfolio/performance`
+
+**Authentication**: Required
+
+**Query Parameters**:
+- `period`: 1W, 1M, 3M, 6M, 1Y (default: 1M)
+
+**Success Response** (200):
+```json
+{
+  "status": "success",
+  "data": {
+    "period": "1M",
+    "dataPoints": [
+      {
+        "date": "2025-01-01",
+        "value": 20000.00,
+        "change": 0.00,
+        "changePercent": 0.00
+      },
+      {
+        "date": "2025-01-15",
+        "value": 22500.00,
+        "change": 2500.00,
+        "changePercent": 12.50
+      }
+    ]
+  }
+}
+```
+
+---
+
+## Stock Screener Endpoints
+
+### Screen Stocks
+
+Screen stocks based on custom filters.
+
+**Endpoint**: `POST /api/v1/screener`
+
+**Request Body**:
+```json
+{
+  "filters": {
+    "peRatio": { "min": 10, "max": 25 },
+    "pbRatio": { "max": 3 },
+    "marketCap": { "min": 10000000000 },
+    "dividendYield": { "min": 0.02 },
+    "profitMargin": { "min": 0.15 },
+    "sector": "Technology"
+  },
+  "symbols": ["AAPL", "MSFT", "GOOGL"],
+  "limit": 20
+}
+```
+
+**Available Filters**:
+- `peRatio`: Price-to-earnings ratio (min/max)
+- `pbRatio`: Price-to-book ratio (min/max)
+- `pegRatio`: Price/earnings-to-growth ratio (min/max)
+- `marketCap`: Market capitalization (min/max)
+- `dividendYield`: Dividend yield as decimal (min/max)
+- `profitMargin`: Profit margin as decimal (min/max)
+- `revenueGrowth`: Revenue growth rate (min/max)
+- `beta`: Stock beta (min/max)
+- `sector`: Filter by sector name
+
+**Success Response** (200):
+```json
+{
+  "status": "success",
+  "data": {
+    "count": 15,
+    "results": [
+      {
+        "symbol": "AAPL",
+        "name": "Apple Inc.",
+        "sector": "Technology",
+        "peRatio": 28.5,
+        "pbRatio": 45.2,
+        "marketCap": 2800000000000,
+        "dividendYield": 0.0055,
+        "profitMargin": 0.25,
+        "beta": 1.28
+      }
+    ]
+  }
+}
+```
+
+---
+
+### Get Preset Screeners
+
+Get list of available preset screener configurations.
+
+**Endpoint**: `GET /api/v1/screener/presets`
+
+**Success Response** (200):
+```json
+{
+  "status": "success",
+  "data": {
+    "value_stocks": {
+      "peRatio": { "max": 15 },
+      "pbRatio": { "max": 1.5 },
+      "dividendYield": { "min": 0.03 }
+    },
+    "growth_stocks": {
+      "revenueGrowth": { "min": 0.2 },
+      "pegRatio": { "max": 2 }
+    },
+    "dividend_aristocrats": {
+      "dividendYield": { "min": 0.025 },
+      "marketCap": { "min": 10000000000 }
+    },
+    "large_cap_tech": {
+      "sector": "Technology",
+      "marketCap": { "min": 100000000000 }
+    },
+    "low_volatility": {
+      "beta": { "max": 0.8 }
+    },
+    "high_momentum": {
+      "beta": { "min": 1.3 }
+    }
+  }
+}
+```
+
+---
+
+### Run Preset Screener
+
+Run a preset screener configuration.
+
+**Endpoint**: `GET /api/v1/screener/presets/:preset`
+
+**URL Parameters**:
+- `preset`: Preset name (value_stocks, growth_stocks, dividend_aristocrats, large_cap_tech, low_volatility, high_momentum)
+
+**Query Parameters**:
+- `limit`: Number of results (default: 20)
+
+**Success Response** (200):
+```json
+{
+  "status": "success",
+  "preset": "value_stocks",
+  "data": {
+    "count": 12,
+    "results": [...]
+  }
+}
+```
+
+**Error Response** (400):
+```json
+{
+  "status": "error",
+  "message": "Invalid preset. Available presets: value_stocks, growth_stocks, dividend_aristocrats, large_cap_tech, low_volatility, high_momentum"
+}
+```
+
+---
+
+### Get Available Sectors
+
+Get list of sectors available for filtering.
+
+**Endpoint**: `GET /api/v1/screener/sectors`
+
+**Success Response** (200):
+```json
+{
+  "status": "success",
+  "data": [
+    "Technology",
+    "Healthcare",
+    "Financials",
+    "Consumer Discretionary",
+    "Consumer Staples",
+    "Industrials",
+    "Energy",
+    "Utilities",
+    "Materials",
+    "Real Estate",
+    "Communication Services"
+  ]
+}
+```
+
+---
+
+## Price Alerts Endpoints
+
+All alerts endpoints require authentication.
+
+### Create Alert
+
+Create a new price alert.
+
+**Endpoint**: `POST /api/v1/alerts`
+
+**Authentication**: Required
+
+**Request Body**:
+```json
+{
+  "symbol": "AAPL",
+  "condition": "ABOVE",
+  "targetPrice": 200.00,
+  "note": "Target reached for taking profits"
+}
+```
+
+**Condition Types**:
+- `ABOVE`: Triggers when price is at or above target
+- `BELOW`: Triggers when price is at or below target
+- `CROSSES_ABOVE`: Triggers when price crosses above target
+- `CROSSES_BELOW`: Triggers when price crosses below target
+
+**Success Response** (201):
+```json
+{
+  "status": "success",
+  "data": {
+    "id": 1,
+    "userId": 1,
+    "symbol": "AAPL",
+    "condition": "ABOVE",
+    "targetPrice": "200.00",
+    "status": "ACTIVE",
+    "note": "Target reached for taking profits",
+    "createdAt": "2025-01-15T10:00:00.000Z",
+    "updatedAt": "2025-01-15T10:00:00.000Z",
+    "triggeredAt": null
+  }
+}
+```
+
+---
+
+### Get User Alerts
+
+Get all alerts for the authenticated user.
+
+**Endpoint**: `GET /api/v1/alerts`
+
+**Authentication**: Required
+
+**Query Parameters**:
+- `status`: Filter by status (ACTIVE, TRIGGERED, CANCELLED)
+
+**Success Response** (200):
+```json
+{
+  "status": "success",
+  "data": [
+    {
+      "id": 1,
+      "userId": 1,
+      "symbol": "AAPL",
+      "condition": "ABOVE",
+      "targetPrice": "200.00",
+      "status": "ACTIVE",
+      "note": "Target reached",
+      "createdAt": "2025-01-15T10:00:00.000Z",
+      "updatedAt": "2025-01-15T10:00:00.000Z",
+      "triggeredAt": null
+    }
+  ]
+}
+```
+
+---
+
+### Get Alert Statistics
+
+Get alert statistics for the user.
+
+**Endpoint**: `GET /api/v1/alerts/stats`
+
+**Authentication**: Required
+
+**Success Response** (200):
+```json
+{
+  "status": "success",
+  "data": {
+    "active": 5,
+    "triggered": 3,
+    "cancelled": 2,
+    "total": 10
+  }
+}
+```
+
+---
+
+### Check Alerts
+
+Check all active alerts against current prices.
+
+**Endpoint**: `POST /api/v1/alerts/check`
+
+**Authentication**: Required
+
+**Success Response** (200):
+```json
+{
+  "status": "success",
+  "data": {
+    "checked": 5,
+    "triggered": 1,
+    "active": 4,
+    "results": [
+      {
+        "id": 1,
+        "symbol": "AAPL",
+        "condition": "ABOVE",
+        "targetPrice": "200.00",
+        "status": "TRIGGERED",
+        "currentPrice": 205.50,
+        "triggered": true,
+        "triggeredAt": "2025-01-15T12:00:00.000Z"
+      }
+    ]
+  }
+}
+```
+
+---
+
+### Get Specific Alert
+
+Get a specific alert by ID.
+
+**Endpoint**: `GET /api/v1/alerts/:id`
+
+**Authentication**: Required
+
+**URL Parameters**:
+- `id`: Alert ID
+
+**Success Response** (200):
+```json
+{
+  "status": "success",
+  "data": {
+    "id": 1,
+    "userId": 1,
+    "symbol": "AAPL",
+    "condition": "ABOVE",
+    "targetPrice": "200.00",
+    "status": "ACTIVE",
+    "note": null,
+    "createdAt": "2025-01-15T10:00:00.000Z",
+    "updatedAt": "2025-01-15T10:00:00.000Z",
+    "triggeredAt": null
+  }
+}
+```
+
+---
+
+### Update Alert
+
+Update an existing alert.
+
+**Endpoint**: `PUT /api/v1/alerts/:id`
+
+**Authentication**: Required
+
+**URL Parameters**:
+- `id`: Alert ID
+
+**Request Body** (all fields optional):
+```json
+{
+  "condition": "BELOW",
+  "targetPrice": 180.00,
+  "note": "Updated target"
+}
+```
+
+**Success Response** (200):
+```json
+{
+  "status": "success",
+  "data": {
+    "id": 1,
+    "symbol": "AAPL",
+    "condition": "BELOW",
+    "targetPrice": "180.00",
+    "status": "ACTIVE",
+    "note": "Updated target",
+    "updatedAt": "2025-01-15T11:00:00.000Z"
+  }
+}
+```
+
+---
+
+### Cancel Alert
+
+Cancel an active alert.
+
+**Endpoint**: `POST /api/v1/alerts/:id/cancel`
+
+**Authentication**: Required
+
+**URL Parameters**:
+- `id`: Alert ID
+
+**Success Response** (200):
+```json
+{
+  "status": "success",
+  "data": {
+    "id": 1,
+    "symbol": "AAPL",
+    "status": "CANCELLED"
+  }
+}
+```
+
+---
+
+### Delete Alert
+
+Delete an alert permanently.
+
+**Endpoint**: `DELETE /api/v1/alerts/:id`
+
+**Authentication**: Required
+
+**URL Parameters**:
+- `id`: Alert ID
+
+**Success Response** (200):
+```json
+{
+  "status": "success",
+  "data": {
+    "message": "Alert deleted successfully"
+  }
+}
+```
+
+---
+
+## WebSocket API
+
+Real-time data streaming using Socket.IO.
+
+### Connection
+
+Connect to the WebSocket server at the same host as the REST API.
+
+```javascript
+import { io } from 'socket.io-client';
+
+// Unauthenticated connection
+const socket = io('http://localhost:3000');
+
+// Authenticated connection
+const socket = io('http://localhost:3000', {
+  auth: {
+    token: 'your_jwt_token'
+  }
+});
+
+socket.on('connected', (data) => {
+  console.log('Connected:', data.socketId);
+  console.log('Authenticated:', data.authenticated);
+});
+```
+
+---
+
+### Events (Client to Server)
+
+#### Subscribe to Price Updates
+
+**Event**: `subscribe:prices`
+
+**Payload**:
+```json
+{
+  "symbols": ["AAPL", "MSFT", "GOOGL"]
+}
+```
+
+Maximum 20 symbols per subscription. Prices update every 30 seconds.
+
+---
+
+#### Unsubscribe from Prices
+
+**Event**: `unsubscribe:prices`
+
+**Payload**:
+```json
+{
+  "symbols": ["AAPL"]
+}
+```
+
+---
+
+#### Subscribe to Portfolio/Alerts
+
+Requires authentication.
+
+**Events**: `subscribe:portfolio`, `subscribe:alerts`
+
+---
+
+### Events (Server to Client)
+
+#### Price Update
+
+**Event**: `price:update`
+
+```json
+{
+  "symbol": "AAPL",
+  "price": 182.50,
+  "change": 2.30,
+  "changePercent": 1.27,
+  "volume": 50123456,
+  "timestamp": "2025-01-15T12:00:00.000Z"
+}
+```
+
+---
+
+#### Alert Triggered
+
+**Event**: `alert:triggered`
+
+```json
+{
+  "id": 1,
+  "symbol": "AAPL",
+  "condition": "ABOVE",
+  "targetPrice": 200,
+  "currentPrice": 205.50,
+  "triggeredAt": "2025-01-15T12:00:00.000Z"
+}
+```
+
+---
+
+#### Portfolio Update
+
+**Event**: `portfolio:update`
+
+```json
+{
+  "totalValue": 25000.00,
+  "totalGain": 5000.00,
+  "totalGainPercent": 25.00,
+  "dayChange": 500.00,
+  "dayChangePercent": 2.04,
+  "timestamp": "2025-01-15T12:00:00.000Z"
+}
+```
+
+---
+
+### REST Endpoints
+
+#### Get WebSocket Stats
+
+**Endpoint**: `GET /api/v1/websocket/stats`
+
+Returns connection statistics including total connections, active symbols, and subscription counts.
+
+---
+
+#### Check WebSocket Health
+
+**Endpoint**: `GET /api/v1/websocket/health`
+
+Returns WebSocket server health status.
+
+---
+
 ## Caching
 
-Market data endpoints are cached for 5 minutes to reduce API calls and improve performance. Subsequent requests within the cache window will return cached data.
+- Market data endpoints: 5-minute cache
+- Finnhub news endpoints: 2-minute cache
+
+Subsequent requests within the cache window will return cached data.
 
 ## Notes
 
 - All timestamps are in ISO 8601 format (UTC)
 - Decimal values (prices) are returned as strings to preserve precision
 - Symbol parameters are case-insensitive and converted to uppercase
-- The Alpha Vantage free tier allows 500 requests per day
+- The Alpha Vantage free tier allows 25 requests per day (500 with premium)
+- Finnhub free tier allows 60 requests per minute

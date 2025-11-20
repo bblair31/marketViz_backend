@@ -19,6 +19,7 @@ model User {
 
   transactions Transaction[]
   searches     Search[]
+  priceAlerts  PriceAlert[]
 
   @@map("users")
 }
@@ -65,4 +66,38 @@ model Search {
   @@index([userId])
   @@index([createdAt])
   @@map("searches")
+}
+
+enum AlertCondition {
+  ABOVE
+  BELOW
+  CROSSES_ABOVE
+  CROSSES_BELOW
+}
+
+enum AlertStatus {
+  ACTIVE
+  TRIGGERED
+  CANCELLED
+}
+
+model PriceAlert {
+  id          Int            @id @default(autoincrement())
+  userId      Int            @map("user_id")
+  symbol      String         @db.VarChar(10)
+  condition   AlertCondition
+  targetPrice Decimal        @map("target_price") @db.Decimal(10, 2)
+  status      AlertStatus    @default(ACTIVE)
+  note        String?        @db.VarChar(500)
+  createdAt   DateTime       @default(now()) @map("created_at")
+  updatedAt   DateTime       @updatedAt @map("updated_at")
+  triggeredAt DateTime?      @map("triggered_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([symbol])
+  @@index([status])
+  @@index([userId, status])
+  @@map("price_alerts")
 }

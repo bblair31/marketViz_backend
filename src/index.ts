@@ -1,7 +1,9 @@
+import { createServer } from 'http';
 import { createApp } from './app';
 import { config } from './config/env';
 import { connectDatabase, disconnectDatabase } from './database/client';
 import { logger } from './utils/logger';
+import { websocketService } from './services/websocket.service';
 
 const startServer = async () => {
   try {
@@ -11,10 +13,15 @@ const startServer = async () => {
     // Create Express app
     const app = createApp();
 
+    // Create HTTP server and attach WebSocket
+    const httpServer = createServer(app);
+    websocketService.initialize(httpServer);
+
     // Start server
-    const server = app.listen(config.port, () => {
+    const server = httpServer.listen(config.port, () => {
       logger.info(`🚀 Server running in ${config.nodeEnv} mode on port ${config.port}`);
       logger.info(`📊 API available at http://localhost:${config.port}/api/v1`);
+      logger.info(`🔌 WebSocket server available at ws://localhost:${config.port}`);
     });
 
     // Graceful shutdown
