@@ -22,6 +22,7 @@ import newsRoutes from './routes/news.routes';
 import portfolioRoutes from './routes/portfolio.routes';
 import screenerRoutes from './routes/screener.routes';
 import alertsRoutes from './routes/alerts.routes';
+import websocketRoutes from './routes/websocket.routes';
 
 export const createApp = (): Application => {
   const app = express();
@@ -85,6 +86,7 @@ export const createApp = (): Application => {
   app.use('/api/v1/portfolio', portfolioRoutes);
   app.use('/api/v1/screener', screenerRoutes);
   app.use('/api/v1/alerts', alertsRoutes);
+  app.use('/api/v1/websocket', websocketRoutes);
 
   // 404 handler
   app.use(notFoundHandler);

@@ -17,6 +17,7 @@ A modern, TypeScript-based backend API for MarketViz - a financial portfolio vis
 - **Portfolio Analytics**: Sharpe ratio, correlation matrix, beta, performance tracking
 - **Stock Screener**: Screen stocks by PE, PB, market cap, dividends, growth metrics
 - **Price Alerts**: Set alerts for price targets with ABOVE/BELOW conditions
+- **Real-time WebSocket**: Live price streaming, alert notifications, portfolio updates
 - **Smart Caching**: In-memory caching to optimize API calls and reduce costs
 
 ### Market Data

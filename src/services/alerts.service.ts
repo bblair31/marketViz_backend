@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 import { alphaVantageService } from './alphaVantage.service';
+import { websocketService } from './websocket.service';
 import { logger } from '../utils/logger';
 import { NotFoundError, BadRequestError } from '../utils/errors';
 
@@ -227,6 +228,15 @@ class AlertsService {
         logger.info(
           `Alert ${alert.id} triggered: ${symbol} ${alert.condition} ${targetPrice}, current: ${currentPrice}`
         );
+
+        // Emit WebSocket notification
+        websocketService.emitAlertTriggered(alert.userId, {
+          id: alert.id,
+          symbol,
+          condition: alert.condition,
+          targetPrice,
+          currentPrice,
+        });
       }
     }
 
@@ -301,6 +311,15 @@ class AlertsService {
                 status: 'TRIGGERED',
                 triggeredAt: new Date(),
               },
+            });
+
+            // Emit WebSocket notification
+            websocketService.emitAlertTriggered(alert.userId, {
+              id: alert.id,
+              symbol,
+              condition: alert.condition,
+              targetPrice,
+              currentPrice,
             });
           }
 

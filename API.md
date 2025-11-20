@@ -15,6 +15,7 @@ Complete API reference for the MarketViz Backend.
 - [Portfolio Endpoints](#portfolio-endpoints)
 - [Stock Screener Endpoints](#stock-screener-endpoints)
 - [Price Alerts Endpoints](#price-alerts-endpoints)
+- [WebSocket API](#websocket-api)
 
 ## Authentication
 
@@ -1384,6 +1385,144 @@ Delete an alert permanently.
   }
 }
 ```
+
+---
+
+## WebSocket API
+
+Real-time data streaming using Socket.IO.
+
+### Connection
+
+Connect to the WebSocket server at the same host as the REST API.
+
+```javascript
+import { io } from 'socket.io-client';
+
+// Unauthenticated connection
+const socket = io('http://localhost:3000');
+
+// Authenticated connection
+const socket = io('http://localhost:3000', {
+  auth: {
+    token: 'your_jwt_token'
+  }
+});
+
+socket.on('connected', (data) => {
+  console.log('Connected:', data.socketId);
+  console.log('Authenticated:', data.authenticated);
+});
+```
+
+---
+
+### Events (Client to Server)
+
+#### Subscribe to Price Updates
+
+**Event**: `subscribe:prices`
+
+**Payload**:
+```json
+{
+  "symbols": ["AAPL", "MSFT", "GOOGL"]
+}
+```
+
+Maximum 20 symbols per subscription. Prices update every 30 seconds.
+
+---
+
+#### Unsubscribe from Prices
+
+**Event**: `unsubscribe:prices`
+
+**Payload**:
+```json
+{
+  "symbols": ["AAPL"]
+}
+```
+
+---
+
+#### Subscribe to Portfolio/Alerts
+
+Requires authentication.
+
+**Events**: `subscribe:portfolio`, `subscribe:alerts`
+
+---
+
+### Events (Server to Client)
+
+#### Price Update
+
+**Event**: `price:update`
+
+```json
+{
+  "symbol": "AAPL",
+  "price": 182.50,
+  "change": 2.30,
+  "changePercent": 1.27,
+  "volume": 50123456,
+  "timestamp": "2025-01-15T12:00:00.000Z"
+}
+```
+
+---
+
+#### Alert Triggered
+
+**Event**: `alert:triggered`
+
+```json
+{
+  "id": 1,
+  "symbol": "AAPL",
+  "condition": "ABOVE",
+  "targetPrice": 200,
+  "currentPrice": 205.50,
+  "triggeredAt": "2025-01-15T12:00:00.000Z"
+}
+```
+
+---
+
+#### Portfolio Update
+
+**Event**: `portfolio:update`
+
+```json
+{
+  "totalValue": 25000.00,
+  "totalGain": 5000.00,
+  "totalGainPercent": 25.00,
+  "dayChange": 500.00,
+  "dayChangePercent": 2.04,
+  "timestamp": "2025-01-15T12:00:00.000Z"
+}
+```
+
+---
+
+### REST Endpoints
+
+#### Get WebSocket Stats
+
+**Endpoint**: `GET /api/v1/websocket/stats`
+
+Returns connection statistics including total connections, active symbols, and subscription counts.
+
+---
+
+#### Check WebSocket Health
+
+**Endpoint**: `GET /api/v1/websocket/health`
+
+Returns WebSocket server health status.
 
 ---
 
