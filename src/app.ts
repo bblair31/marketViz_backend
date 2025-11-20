@@ -20,6 +20,7 @@ import watchlistRoutes from './routes/watchlist.routes';
 import economicRoutes from './routes/economic.routes';
 import newsRoutes from './routes/news.routes';
 import portfolioRoutes from './routes/portfolio.routes';
+import screenerRoutes from './routes/screener.routes';
 
 export const createApp = (): Application => {
   const app = express();
@@ -81,6 +82,7 @@ export const createApp = (): Application => {
   app.use('/api/v1/economic', economicRoutes);
   app.use('/api/v1/news', newsRoutes);
   app.use('/api/v1/portfolio', portfolioRoutes);
+  app.use('/api/v1/screener', screenerRoutes);
 
   // 404 handler
   app.use(notFoundHandler);

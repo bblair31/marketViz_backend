@@ -10,6 +10,10 @@ Complete API reference for the MarketViz Backend.
 - [Authentication Endpoints](#authentication-endpoints)
 - [Watchlist Endpoints](#watchlist-endpoints)
 - [Market Data Endpoints](#market-data-endpoints)
+- [Economic Indicators Endpoints](#economic-indicators-endpoints)
+- [News Endpoints](#news-endpoints)
+- [Portfolio Endpoints](#portfolio-endpoints)
+- [Stock Screener Endpoints](#stock-screener-endpoints)
 
 ## Authentication
 
@@ -833,6 +837,294 @@ Returns institutional holdings. **Requires Finnhub API key.**
 - `exchange`: Exchange code (default: US)
 
 **Requires Finnhub API key.**
+
+---
+
+## Portfolio Endpoints
+
+All portfolio endpoints require authentication.
+
+### Get Portfolio Summary
+
+Get portfolio summary with current values and gains/losses.
+
+**Endpoint**: `GET /api/v1/portfolio/summary`
+
+**Authentication**: Required
+
+**Success Response** (200):
+```json
+{
+  "status": "success",
+  "data": {
+    "holdings": [
+      {
+        "symbol": "AAPL",
+        "companyName": "Apple Inc.",
+        "quantity": 10,
+        "averageCost": 150.50,
+        "currentPrice": 182.50,
+        "currentValue": 1825.00,
+        "totalCost": 1505.00,
+        "gain": 320.00,
+        "gainPercent": 21.26
+      }
+    ],
+    "totalValue": 25000.00,
+    "totalCost": 20000.00,
+    "totalGain": 5000.00,
+    "totalGainPercent": 25.00
+  }
+}
+```
+
+---
+
+### Get Portfolio Metrics
+
+Get portfolio risk and performance metrics.
+
+**Endpoint**: `GET /api/v1/portfolio/metrics`
+
+**Authentication**: Required
+
+**Success Response** (200):
+```json
+{
+  "status": "success",
+  "data": {
+    "sharpeRatio": 1.45,
+    "standardDeviation": 0.18,
+    "beta": 1.12,
+    "alpha": 0.05,
+    "diversificationScore": 7.5
+  }
+}
+```
+
+---
+
+### Get Correlation Matrix
+
+Get correlation matrix between portfolio holdings.
+
+**Endpoint**: `GET /api/v1/portfolio/correlation`
+
+**Authentication**: Required
+
+**Success Response** (200):
+```json
+{
+  "status": "success",
+  "data": {
+    "symbols": ["AAPL", "MSFT", "GOOGL"],
+    "matrix": [
+      [1.0, 0.85, 0.78],
+      [0.85, 1.0, 0.82],
+      [0.78, 0.82, 1.0]
+    ]
+  }
+}
+```
+
+---
+
+### Get Performance History
+
+Get portfolio performance over time.
+
+**Endpoint**: `GET /api/v1/portfolio/performance`
+
+**Authentication**: Required
+
+**Query Parameters**:
+- `period`: 1W, 1M, 3M, 6M, 1Y (default: 1M)
+
+**Success Response** (200):
+```json
+{
+  "status": "success",
+  "data": {
+    "period": "1M",
+    "dataPoints": [
+      {
+        "date": "2025-01-01",
+        "value": 20000.00,
+        "change": 0.00,
+        "changePercent": 0.00
+      },
+      {
+        "date": "2025-01-15",
+        "value": 22500.00,
+        "change": 2500.00,
+        "changePercent": 12.50
+      }
+    ]
+  }
+}
+```
+
+---
+
+## Stock Screener Endpoints
+
+### Screen Stocks
+
+Screen stocks based on custom filters.
+
+**Endpoint**: `POST /api/v1/screener`
+
+**Request Body**:
+```json
+{
+  "filters": {
+    "peRatio": { "min": 10, "max": 25 },
+    "pbRatio": { "max": 3 },
+    "marketCap": { "min": 10000000000 },
+    "dividendYield": { "min": 0.02 },
+    "profitMargin": { "min": 0.15 },
+    "sector": "Technology"
+  },
+  "symbols": ["AAPL", "MSFT", "GOOGL"],
+  "limit": 20
+}
+```
+
+**Available Filters**:
+- `peRatio`: Price-to-earnings ratio (min/max)
+- `pbRatio`: Price-to-book ratio (min/max)
+- `pegRatio`: Price/earnings-to-growth ratio (min/max)
+- `marketCap`: Market capitalization (min/max)
+- `dividendYield`: Dividend yield as decimal (min/max)
+- `profitMargin`: Profit margin as decimal (min/max)
+- `revenueGrowth`: Revenue growth rate (min/max)
+- `beta`: Stock beta (min/max)
+- `sector`: Filter by sector name
+
+**Success Response** (200):
+```json
+{
+  "status": "success",
+  "data": {
+    "count": 15,
+    "results": [
+      {
+        "symbol": "AAPL",
+        "name": "Apple Inc.",
+        "sector": "Technology",
+        "peRatio": 28.5,
+        "pbRatio": 45.2,
+        "marketCap": 2800000000000,
+        "dividendYield": 0.0055,
+        "profitMargin": 0.25,
+        "beta": 1.28
+      }
+    ]
+  }
+}
+```
+
+---
+
+### Get Preset Screeners
+
+Get list of available preset screener configurations.
+
+**Endpoint**: `GET /api/v1/screener/presets`
+
+**Success Response** (200):
+```json
+{
+  "status": "success",
+  "data": {
+    "value_stocks": {
+      "peRatio": { "max": 15 },
+      "pbRatio": { "max": 1.5 },
+      "dividendYield": { "min": 0.03 }
+    },
+    "growth_stocks": {
+      "revenueGrowth": { "min": 0.2 },
+      "pegRatio": { "max": 2 }
+    },
+    "dividend_aristocrats": {
+      "dividendYield": { "min": 0.025 },
+      "marketCap": { "min": 10000000000 }
+    },
+    "large_cap_tech": {
+      "sector": "Technology",
+      "marketCap": { "min": 100000000000 }
+    },
+    "low_volatility": {
+      "beta": { "max": 0.8 }
+    },
+    "high_momentum": {
+      "beta": { "min": 1.3 }
+    }
+  }
+}
+```
+
+---
+
+### Run Preset Screener
+
+Run a preset screener configuration.
+
+**Endpoint**: `GET /api/v1/screener/presets/:preset`
+
+**URL Parameters**:
+- `preset`: Preset name (value_stocks, growth_stocks, dividend_aristocrats, large_cap_tech, low_volatility, high_momentum)
+
+**Query Parameters**:
+- `limit`: Number of results (default: 20)
+
+**Success Response** (200):
+```json
+{
+  "status": "success",
+  "preset": "value_stocks",
+  "data": {
+    "count": 12,
+    "results": [...]
+  }
+}
+```
+
+**Error Response** (400):
+```json
+{
+  "status": "error",
+  "message": "Invalid preset. Available presets: value_stocks, growth_stocks, dividend_aristocrats, large_cap_tech, low_volatility, high_momentum"
+}
+```
+
+---
+
+### Get Available Sectors
+
+Get list of sectors available for filtering.
+
+**Endpoint**: `GET /api/v1/screener/sectors`
+
+**Success Response** (200):
+```json
+{
+  "status": "success",
+  "data": [
+    "Technology",
+    "Healthcare",
+    "Financials",
+    "Consumer Discretionary",
+    "Consumer Staples",
+    "Industrials",
+    "Energy",
+    "Utilities",
+    "Materials",
+    "Real Estate",
+    "Communication Services"
+  ]
+}
+```
 
 ---
 
