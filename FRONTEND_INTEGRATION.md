@@ -735,9 +735,7 @@ NEXT_PUBLIC_API_BASE_URL=http://localhost:3000/api/v1  # for Next.js
 ```
 
 ### 6. WebSocket Support
-**Not implemented yet** - all updates are poll-based. If you want real-time price updates, you'll need to:
-- Poll the quote endpoint periodically (every 30-60 seconds)
-- Use a WebSocket library on the backend (future enhancement)
+**Now Implemented!** See [WebSocket Integration](#websocket-integration) section below.
 
 ### 7. Demo Account (After Seeding)
 ```
@@ -825,4 +823,377 @@ curl http://localhost:3000/api/v1/watchlist \
 
 ---
 
-**Last Updated**: January 2025 (TypeScript modernization)
+**Last Updated**: November 2025 (Major feature expansion)
+
+---
+
+## New Features (November 2025)
+
+### Dependencies
+
+```bash
+npm install socket.io-client
+```
+
+---
+
+## Portfolio Analytics Endpoints
+
+All require `Authorization: Bearer <token>` header.
+
+### Get Portfolio Summary
+**Endpoint**: `GET /portfolio/summary`
+
+Returns holdings with current values and gains.
+
+```typescript
+interface PortfolioSummary {
+  holdings: Array<{
+    symbol: string;
+    companyName: string;
+    priceBought: number;
+    currentPrice: number;
+    change: number;
+    changePercent: number;
+    gain: number;
+    gainPercent: number;
+  }>;
+  totalValue: number;
+  totalCost: number;
+  totalGain: number;
+  totalGainPercent: number;
+  dayChange: number;
+  dayChangePercent: number;
+}
+```
+
+### Get Portfolio Metrics
+**Endpoint**: `GET /portfolio/metrics`
+
+Returns risk metrics.
+
+```typescript
+interface PortfolioMetrics {
+  sharpeRatio: number;
+  standardDeviation: number;
+  beta: number;
+  diversificationScore: number;
+}
+```
+
+### Get Correlation Matrix
+**Endpoint**: `GET /portfolio/correlation`
+
+```typescript
+interface CorrelationMatrix {
+  symbols: string[];
+  matrix: number[][];  // NxN correlation values
+}
+```
+
+### Get Performance History
+**Endpoint**: `GET /portfolio/performance?period=1M`
+
+Periods: `1W`, `1M`, `3M`, `6M`, `1Y`
+
+```typescript
+interface PerformanceData {
+  date: string;
+  value: number;
+}[]
+```
+
+---
+
+## Stock Screener Endpoints
+
+### Screen Stocks
+**Endpoint**: `POST /screener`
+
+```typescript
+// Request
+interface ScreenerRequest {
+  filters: {
+    peRatio?: { min?: number; max?: number };
+    pbRatio?: { min?: number; max?: number };
+    pegRatio?: { min?: number; max?: number };
+    marketCap?: { min?: number; max?: number };
+    dividendYield?: { min?: number; max?: number };
+    profitMargin?: { min?: number; max?: number };
+    revenueGrowth?: { min?: number; max?: number };
+    beta?: { min?: number; max?: number };
+    sector?: string;
+  };
+  symbols?: string[];  // Defaults to 100-stock universe
+  limit?: number;      // Default 20
+}
+
+// Response
+interface ScreenerResult {
+  symbol: string;
+  name: string;
+  sector: string;
+  peRatio: number | null;
+  pbRatio: number | null;
+  marketCap: number | null;
+  dividendYield: number | null;
+  profitMargin: number | null;
+  beta: number | null;
+}
+```
+
+### Get Presets
+**Endpoint**: `GET /screener/presets`
+
+Returns available presets: `value_stocks`, `growth_stocks`, `dividend_aristocrats`, `large_cap_tech`, `low_volatility`, `high_momentum`
+
+### Run Preset
+**Endpoint**: `GET /screener/presets/:preset?limit=20`
+
+### Get Sectors
+**Endpoint**: `GET /screener/sectors`
+
+---
+
+## Price Alerts Endpoints
+
+All require authentication.
+
+### Create Alert
+**Endpoint**: `POST /alerts`
+
+```typescript
+interface CreateAlert {
+  symbol: string;
+  condition: 'ABOVE' | 'BELOW' | 'CROSSES_ABOVE' | 'CROSSES_BELOW';
+  targetPrice: number;
+  note?: string;
+}
+```
+
+### List Alerts
+**Endpoint**: `GET /alerts?status=ACTIVE`
+
+Status filter: `ACTIVE`, `TRIGGERED`, `CANCELLED`
+
+### Get Alert Stats
+**Endpoint**: `GET /alerts/stats`
+
+```typescript
+interface AlertStats {
+  active: number;
+  triggered: number;
+  cancelled: number;
+  total: number;
+}
+```
+
+### Check Alerts
+**Endpoint**: `POST /alerts/check`
+
+Checks all active alerts against current prices and returns which triggered.
+
+### Update Alert
+**Endpoint**: `PUT /alerts/:id`
+
+### Cancel Alert
+**Endpoint**: `POST /alerts/:id/cancel`
+
+### Delete Alert
+**Endpoint**: `DELETE /alerts/:id`
+
+---
+
+## Technical Indicators
+
+All follow pattern: `GET /market/indicators/:symbol/:indicator`
+
+| Indicator | Endpoint | Extra Params |
+|-----------|----------|--------------|
+| RSI | `/market/indicators/:symbol/rsi` | interval, period |
+| MACD | `/market/indicators/:symbol/macd` | fast_period, slow_period, signal_period |
+| Bollinger | `/market/indicators/:symbol/bbands` | period, nbdevup, nbdevdn |
+| SMA | `/market/indicators/:symbol/sma` | period |
+| EMA | `/market/indicators/:symbol/ema` | period |
+| ADX | `/market/indicators/:symbol/adx` | period |
+| Stochastic | `/market/indicators/:symbol/stoch` | - |
+| ATR | `/market/indicators/:symbol/atr` | period |
+| OBV | `/market/indicators/:symbol/obv` | - |
+
+Common params: `interval` (daily/weekly/monthly), `period` (default 14)
+
+---
+
+## Fundamental Data
+
+| Endpoint | Description |
+|----------|-------------|
+| `/market/fundamentals/:symbol/income` | Income statement |
+| `/market/fundamentals/:symbol/balance` | Balance sheet |
+| `/market/fundamentals/:symbol/cashflow` | Cash flow |
+| `/market/fundamentals/:symbol/earnings` | Earnings |
+| `/market/calendar/earnings` | Upcoming earnings |
+| `/market/calendar/ipo` | Upcoming IPOs |
+
+---
+
+## Economic Indicators
+
+| Endpoint | Description |
+|----------|-------------|
+| `/economic/gdp?interval=annual` | GDP |
+| `/economic/treasury-yield?maturity=10year` | Treasury yields |
+| `/economic/federal-funds-rate` | Fed funds rate |
+| `/economic/cpi` | Consumer Price Index |
+| `/economic/inflation` | Inflation rate |
+| `/economic/unemployment` | Unemployment rate |
+| `/economic/retail-sales` | Retail sales |
+| `/economic/nonfarm-payroll` | Nonfarm payroll |
+
+---
+
+## Forex & Commodities
+
+### Forex
+| Endpoint | Example |
+|----------|---------|
+| `/market/forex/rate?from=EUR&to=USD` | Exchange rate |
+| `/market/forex/daily?from=EUR&to=USD` | Daily history |
+| `/market/forex/intraday?from=EUR&to=USD&interval=5min` | Intraday |
+
+### Commodities
+`GET /market/commodities/:commodity?interval=monthly`
+
+Commodities: `WTI`, `BRENT`, `NATURAL_GAS`, `COPPER`, `ALUMINUM`, `WHEAT`, `CORN`, `COTTON`, `SUGAR`, `COFFEE`
+
+---
+
+## News & Sentiment
+
+| Endpoint | Description | Requires Finnhub |
+|----------|-------------|------------------|
+| `/news/market?category=general` | Market news | Optional |
+| `/news/company/:symbol` | Company news | Optional |
+| `/news/sentiment/:symbol` | Sentiment analysis | No |
+| `/news/social/:symbol` | Social media | Yes |
+| `/news/insider/:symbol` | Insider trades | Yes |
+| `/news/institutional/:symbol` | Institutional ownership | Yes |
+| `/news/market-status` | Market open/closed | Yes |
+
+---
+
+## WebSocket Integration
+
+### Installation
+```bash
+npm install socket.io-client
+```
+
+### Connection
+```typescript
+import { io, Socket } from 'socket.io-client';
+
+const socket = io('http://localhost:3000', {
+  auth: {
+    token: localStorage.getItem('jwt_token')
+  }
+});
+
+socket.on('connected', (data) => {
+  console.log('Connected:', data.socketId);
+  console.log('Authenticated:', data.authenticated);
+});
+```
+
+### Subscribe to Prices
+```typescript
+// Subscribe (max 20 symbols)
+socket.emit('subscribe:prices', {
+  symbols: ['AAPL', 'MSFT', 'GOOGL']
+});
+
+// Listen for updates (every 30 seconds)
+socket.on('price:update', (data) => {
+  // { symbol, price, change, changePercent, volume, timestamp }
+  updatePriceDisplay(data.symbol, data.price);
+});
+
+// Unsubscribe
+socket.emit('unsubscribe:prices', { symbols: ['AAPL'] });
+```
+
+### Subscribe to Alerts
+```typescript
+socket.emit('subscribe:alerts');
+
+socket.on('alert:triggered', (alert) => {
+  // { id, symbol, condition, targetPrice, currentPrice, triggeredAt }
+  showNotification(`${alert.symbol} alert triggered at $${alert.currentPrice}`);
+});
+```
+
+### Subscribe to Portfolio
+```typescript
+socket.emit('subscribe:portfolio');
+
+socket.on('portfolio:update', (data) => {
+  // { totalValue, totalGain, totalGainPercent, dayChange, dayChangePercent }
+  updatePortfolioCard(data);
+});
+```
+
+### Cleanup
+```typescript
+// On component unmount
+useEffect(() => {
+  return () => socket.disconnect();
+}, []);
+```
+
+---
+
+## Suggested UI Components
+
+### New Pages
+- **Portfolio Dashboard** - metrics cards, performance chart, correlation heatmap
+- **Stock Screener** - filter form, results table, preset buttons
+- **Alerts Manager** - create/list/edit alerts, triggered history
+- **Economic Dashboard** - GDP, CPI, unemployment charts
+
+### Real-time Components
+- **Live Ticker** - WebSocket price streaming
+- **Alert Toast** - show on `alert:triggered` event
+- **Portfolio Value Card** - WebSocket updates
+
+### Charts Needed
+- Line chart for performance history
+- Heatmap for correlation matrix
+- Candlestick with indicator overlays (RSI, MACD, Bollinger)
+
+---
+
+## Database Migration Required
+
+The price alerts feature requires a new database table. Run:
+
+```bash
+npx prisma migrate dev --name add-price-alerts
+```
+
+---
+
+## Quick Reference: All New Endpoints
+
+| Category | Endpoints |
+|----------|-----------|
+| Portfolio | `/portfolio/summary`, `/portfolio/metrics`, `/portfolio/correlation`, `/portfolio/performance` |
+| Screener | `/screener`, `/screener/presets`, `/screener/presets/:preset`, `/screener/sectors` |
+| Alerts | `/alerts`, `/alerts/:id`, `/alerts/:id/cancel`, `/alerts/check`, `/alerts/stats` |
+| Indicators | `/market/indicators/:symbol/:indicator` (rsi, macd, bbands, sma, ema, adx, stoch, atr, obv) |
+| Fundamentals | `/market/fundamentals/:symbol/:type` (income, balance, cashflow, earnings) |
+| Calendars | `/market/calendar/earnings`, `/market/calendar/ipo` |
+| Economic | `/economic/gdp`, `/economic/treasury-yield`, `/economic/federal-funds-rate`, `/economic/cpi`, `/economic/inflation`, `/economic/unemployment`, `/economic/retail-sales`, `/economic/nonfarm-payroll` |
+| Forex | `/market/forex/rate`, `/market/forex/daily`, `/market/forex/intraday`, `/market/forex/weekly` |
+| Commodities | `/market/commodities/:commodity` |
+| News | `/news/market`, `/news/company/:symbol`, `/news/sentiment/:symbol`, `/news/social/:symbol`, `/news/insider/:symbol`, `/news/institutional/:symbol`, `/news/market-status` |
+| WebSocket | `/websocket/stats`, `/websocket/health` |
