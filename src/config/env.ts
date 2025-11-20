@@ -9,6 +9,7 @@ const envSchema = z.object({
   DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
   JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 characters'),
   ALPHA_VANTAGE_API_KEY: z.string().min(1, 'ALPHA_VANTAGE_API_KEY is required'),
+  FINNHUB_API_KEY: z.string().optional(),
   CORS_ORIGIN: z.string().default('http://localhost:3001,http://localhost:3000'),
   RATE_LIMIT_WINDOW_MS: z.string().default('900000'),
   RATE_LIMIT_MAX_REQUESTS: z.string().default('100'),
@@ -48,6 +49,12 @@ export const config = {
     apiKey: env.ALPHA_VANTAGE_API_KEY,
     baseUrl: 'https://www.alphavantage.co/query',
   },
+  finnhub: env.FINNHUB_API_KEY
+    ? {
+        apiKey: env.FINNHUB_API_KEY,
+        baseUrl: 'https://finnhub.io/api/v1',
+      }
+    : undefined,
   cors: {
     origin: env.CORS_ORIGIN.split(',').map((origin) => origin.trim()),
   },

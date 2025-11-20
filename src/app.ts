@@ -13,10 +13,12 @@ import { performanceMonitoring, getPerformanceMetrics } from './middleware/perfo
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { logger } from './utils/logger';
 
-// Import routes (will create these next)
+// Import routes
 import authRoutes from './routes/auth.routes';
 import marketRoutes from './routes/market.routes';
 import watchlistRoutes from './routes/watchlist.routes';
+import economicRoutes from './routes/economic.routes';
+import newsRoutes from './routes/news.routes';
 
 export const createApp = (): Application => {
   const app = express();
@@ -75,6 +77,8 @@ export const createApp = (): Application => {
   app.use('/api/v1/auth', authRoutes);
   app.use('/api/v1/market', marketRoutes);
   app.use('/api/v1/watchlist', watchlistRoutes);
+  app.use('/api/v1/economic', economicRoutes);
+  app.use('/api/v1/news', newsRoutes);
 
   // 404 handler
   app.use(notFoundHandler);
