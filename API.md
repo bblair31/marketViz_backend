@@ -14,6 +14,7 @@ Complete API reference for the MarketViz Backend.
 - [News Endpoints](#news-endpoints)
 - [Portfolio Endpoints](#portfolio-endpoints)
 - [Stock Screener Endpoints](#stock-screener-endpoints)
+- [Price Alerts Endpoints](#price-alerts-endpoints)
 
 ## Authentication
 
@@ -1123,6 +1124,264 @@ Get list of sectors available for filtering.
     "Real Estate",
     "Communication Services"
   ]
+}
+```
+
+---
+
+## Price Alerts Endpoints
+
+All alerts endpoints require authentication.
+
+### Create Alert
+
+Create a new price alert.
+
+**Endpoint**: `POST /api/v1/alerts`
+
+**Authentication**: Required
+
+**Request Body**:
+```json
+{
+  "symbol": "AAPL",
+  "condition": "ABOVE",
+  "targetPrice": 200.00,
+  "note": "Target reached for taking profits"
+}
+```
+
+**Condition Types**:
+- `ABOVE`: Triggers when price is at or above target
+- `BELOW`: Triggers when price is at or below target
+- `CROSSES_ABOVE`: Triggers when price crosses above target
+- `CROSSES_BELOW`: Triggers when price crosses below target
+
+**Success Response** (201):
+```json
+{
+  "status": "success",
+  "data": {
+    "id": 1,
+    "userId": 1,
+    "symbol": "AAPL",
+    "condition": "ABOVE",
+    "targetPrice": "200.00",
+    "status": "ACTIVE",
+    "note": "Target reached for taking profits",
+    "createdAt": "2025-01-15T10:00:00.000Z",
+    "updatedAt": "2025-01-15T10:00:00.000Z",
+    "triggeredAt": null
+  }
+}
+```
+
+---
+
+### Get User Alerts
+
+Get all alerts for the authenticated user.
+
+**Endpoint**: `GET /api/v1/alerts`
+
+**Authentication**: Required
+
+**Query Parameters**:
+- `status`: Filter by status (ACTIVE, TRIGGERED, CANCELLED)
+
+**Success Response** (200):
+```json
+{
+  "status": "success",
+  "data": [
+    {
+      "id": 1,
+      "userId": 1,
+      "symbol": "AAPL",
+      "condition": "ABOVE",
+      "targetPrice": "200.00",
+      "status": "ACTIVE",
+      "note": "Target reached",
+      "createdAt": "2025-01-15T10:00:00.000Z",
+      "updatedAt": "2025-01-15T10:00:00.000Z",
+      "triggeredAt": null
+    }
+  ]
+}
+```
+
+---
+
+### Get Alert Statistics
+
+Get alert statistics for the user.
+
+**Endpoint**: `GET /api/v1/alerts/stats`
+
+**Authentication**: Required
+
+**Success Response** (200):
+```json
+{
+  "status": "success",
+  "data": {
+    "active": 5,
+    "triggered": 3,
+    "cancelled": 2,
+    "total": 10
+  }
+}
+```
+
+---
+
+### Check Alerts
+
+Check all active alerts against current prices.
+
+**Endpoint**: `POST /api/v1/alerts/check`
+
+**Authentication**: Required
+
+**Success Response** (200):
+```json
+{
+  "status": "success",
+  "data": {
+    "checked": 5,
+    "triggered": 1,
+    "active": 4,
+    "results": [
+      {
+        "id": 1,
+        "symbol": "AAPL",
+        "condition": "ABOVE",
+        "targetPrice": "200.00",
+        "status": "TRIGGERED",
+        "currentPrice": 205.50,
+        "triggered": true,
+        "triggeredAt": "2025-01-15T12:00:00.000Z"
+      }
+    ]
+  }
+}
+```
+
+---
+
+### Get Specific Alert
+
+Get a specific alert by ID.
+
+**Endpoint**: `GET /api/v1/alerts/:id`
+
+**Authentication**: Required
+
+**URL Parameters**:
+- `id`: Alert ID
+
+**Success Response** (200):
+```json
+{
+  "status": "success",
+  "data": {
+    "id": 1,
+    "userId": 1,
+    "symbol": "AAPL",
+    "condition": "ABOVE",
+    "targetPrice": "200.00",
+    "status": "ACTIVE",
+    "note": null,
+    "createdAt": "2025-01-15T10:00:00.000Z",
+    "updatedAt": "2025-01-15T10:00:00.000Z",
+    "triggeredAt": null
+  }
+}
+```
+
+---
+
+### Update Alert
+
+Update an existing alert.
+
+**Endpoint**: `PUT /api/v1/alerts/:id`
+
+**Authentication**: Required
+
+**URL Parameters**:
+- `id`: Alert ID
+
+**Request Body** (all fields optional):
+```json
+{
+  "condition": "BELOW",
+  "targetPrice": 180.00,
+  "note": "Updated target"
+}
+```
+
+**Success Response** (200):
+```json
+{
+  "status": "success",
+  "data": {
+    "id": 1,
+    "symbol": "AAPL",
+    "condition": "BELOW",
+    "targetPrice": "180.00",
+    "status": "ACTIVE",
+    "note": "Updated target",
+    "updatedAt": "2025-01-15T11:00:00.000Z"
+  }
+}
+```
+
+---
+
+### Cancel Alert
+
+Cancel an active alert.
+
+**Endpoint**: `POST /api/v1/alerts/:id/cancel`
+
+**Authentication**: Required
+
+**URL Parameters**:
+- `id`: Alert ID
+
+**Success Response** (200):
+```json
+{
+  "status": "success",
+  "data": {
+    "id": 1,
+    "symbol": "AAPL",
+    "status": "CANCELLED"
+  }
+}
+```
+
+---
+
+### Delete Alert
+
+Delete an alert permanently.
+
+**Endpoint**: `DELETE /api/v1/alerts/:id`
+
+**Authentication**: Required
+
+**URL Parameters**:
+- `id`: Alert ID
+
+**Success Response** (200):
+```json
+{
+  "status": "success",
+  "data": {
+    "message": "Alert deleted successfully"
+  }
 }
 ```
 

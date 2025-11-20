@@ -14,6 +14,9 @@ A modern, TypeScript-based backend API for MarketViz - a financial portfolio vis
 - **Modern TypeScript Stack**: Built with TypeScript, Express, and Prisma ORM
 - **JWT Authentication**: Secure user authentication with JSON Web Tokens
 - **Portfolio Management**: Track stocks, transactions, and build watchlists
+- **Portfolio Analytics**: Sharpe ratio, correlation matrix, beta, performance tracking
+- **Stock Screener**: Screen stocks by PE, PB, market cap, dividends, growth metrics
+- **Price Alerts**: Set alerts for price targets with ABOVE/BELOW conditions
 - **Smart Caching**: In-memory caching to optimize API calls and reduce costs
 
 ### Market Data
