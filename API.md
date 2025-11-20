@@ -556,13 +556,297 @@ Get cryptocurrency exchange rate.
 }
 ```
 
+---
+
+### Technical Indicators
+
+All technical indicator endpoints follow this pattern. Query parameters: `interval` (daily/weekly/monthly), `period` (time period).
+
+#### Get Any Indicator
+
+**Endpoint**: `GET /api/v1/market/indicators/:symbol`
+
+**Query Parameters**:
+- `indicator`: Required (RSI, MACD, SMA, EMA, etc.)
+- `interval`: daily, weekly, monthly (default: daily)
+- `period`: Time period (default: 14)
+- `series_type`: close, open, high, low (default: close)
+
+#### Specific Indicator Endpoints
+
+- `GET /api/v1/market/indicators/:symbol/rsi` - Relative Strength Index
+- `GET /api/v1/market/indicators/:symbol/macd` - MACD (includes fast_period, slow_period, signal_period)
+- `GET /api/v1/market/indicators/:symbol/bbands` - Bollinger Bands (includes nbdevup, nbdevdn)
+- `GET /api/v1/market/indicators/:symbol/sma` - Simple Moving Average
+- `GET /api/v1/market/indicators/:symbol/ema` - Exponential Moving Average
+- `GET /api/v1/market/indicators/:symbol/adx` - Average Directional Index
+- `GET /api/v1/market/indicators/:symbol/stoch` - Stochastic Oscillator
+- `GET /api/v1/market/indicators/:symbol/atr` - Average True Range
+- `GET /api/v1/market/indicators/:symbol/obv` - On Balance Volume
+
+---
+
+### Fundamental Data Endpoints
+
+#### Get Income Statement
+
+**Endpoint**: `GET /api/v1/market/fundamentals/:symbol/income`
+
+Returns annual and quarterly income statements.
+
+---
+
+#### Get Balance Sheet
+
+**Endpoint**: `GET /api/v1/market/fundamentals/:symbol/balance`
+
+Returns annual and quarterly balance sheets.
+
+---
+
+#### Get Cash Flow
+
+**Endpoint**: `GET /api/v1/market/fundamentals/:symbol/cashflow`
+
+Returns annual and quarterly cash flow statements.
+
+---
+
+#### Get Earnings
+
+**Endpoint**: `GET /api/v1/market/fundamentals/:symbol/earnings`
+
+Returns annual and quarterly earnings data.
+
+---
+
+#### Get Earnings Calendar
+
+**Endpoint**: `GET /api/v1/market/calendar/earnings`
+
+**Query Parameters**:
+- `horizon`: 3month, 6month, 12month (default: 3month)
+
+---
+
+#### Get IPO Calendar
+
+**Endpoint**: `GET /api/v1/market/calendar/ipo`
+
+Returns upcoming IPOs.
+
+---
+
+### Forex Endpoints
+
+#### Get Exchange Rate
+
+**Endpoint**: `GET /api/v1/market/forex/rate`
+
+**Query Parameters**:
+- `from`: Source currency (required)
+- `to`: Target currency (required)
+
+Example: `GET /api/v1/market/forex/rate?from=EUR&to=USD`
+
+---
+
+#### Get Forex Daily
+
+**Endpoint**: `GET /api/v1/market/forex/daily`
+
+**Query Parameters**:
+- `from`: Source currency (required)
+- `to`: Target currency (required)
+- `outputsize`: compact or full (default: compact)
+
+---
+
+#### Get Forex Intraday
+
+**Endpoint**: `GET /api/v1/market/forex/intraday`
+
+**Query Parameters**:
+- `from`: Source currency (required)
+- `to`: Target currency (required)
+- `interval`: 1min, 5min, 15min, 30min, 60min (default: 5min)
+
+---
+
+#### Get Forex Weekly
+
+**Endpoint**: `GET /api/v1/market/forex/weekly`
+
+**Query Parameters**:
+- `from`: Source currency (required)
+- `to`: Target currency (required)
+
+---
+
+### Commodities Endpoints
+
+#### Get Commodity Data
+
+**Endpoint**: `GET /api/v1/market/commodities/:commodity`
+
+**URL Parameters**:
+- `commodity`: WTI, BRENT, NATURAL_GAS, COPPER, ALUMINUM, WHEAT, CORN, COTTON, SUGAR, COFFEE
+
+**Query Parameters**:
+- `interval`: daily, weekly, monthly (default: monthly)
+
+Example: `GET /api/v1/market/commodities/WTI?interval=daily`
+
+---
+
+## Economic Indicators Endpoints
+
+### Get Real GDP
+
+**Endpoint**: `GET /api/v1/economic/gdp`
+
+**Query Parameters**:
+- `interval`: annual or quarterly (default: annual)
+
+---
+
+### Get Treasury Yield
+
+**Endpoint**: `GET /api/v1/economic/treasury-yield`
+
+**Query Parameters**:
+- `interval`: daily, weekly, monthly (default: monthly)
+- `maturity`: 3month, 2year, 5year, 7year, 10year, 30year (default: 10year)
+
+---
+
+### Get Federal Funds Rate
+
+**Endpoint**: `GET /api/v1/economic/federal-funds-rate`
+
+**Query Parameters**:
+- `interval`: daily, weekly, monthly (default: monthly)
+
+---
+
+### Get CPI
+
+**Endpoint**: `GET /api/v1/economic/cpi`
+
+**Query Parameters**:
+- `interval`: monthly or semiannual (default: monthly)
+
+---
+
+### Get Inflation
+
+**Endpoint**: `GET /api/v1/economic/inflation`
+
+Returns annual inflation rate.
+
+---
+
+### Get Unemployment
+
+**Endpoint**: `GET /api/v1/economic/unemployment`
+
+Returns unemployment rate.
+
+---
+
+### Get Retail Sales
+
+**Endpoint**: `GET /api/v1/economic/retail-sales`
+
+Returns retail sales data.
+
+---
+
+### Get Nonfarm Payroll
+
+**Endpoint**: `GET /api/v1/economic/nonfarm-payroll`
+
+Returns nonfarm payroll data.
+
+---
+
+## News Endpoints
+
+News endpoints use Finnhub if configured, otherwise fall back to AlphaVantage.
+
+### Get Market News
+
+**Endpoint**: `GET /api/v1/news/market`
+
+**Query Parameters**:
+- `category`: general, forex, crypto, merger (default: general)
+
+---
+
+### Get Company News
+
+**Endpoint**: `GET /api/v1/news/company/:symbol`
+
+**Query Parameters**:
+- `from`: Start date YYYY-MM-DD (default: 7 days ago)
+- `to`: End date YYYY-MM-DD (default: today)
+
+---
+
+### Get News Sentiment
+
+**Endpoint**: `GET /api/v1/news/sentiment/:symbol`
+
+Returns sentiment analysis from both AlphaVantage and Finnhub (if configured).
+
+---
+
+### Get Social Sentiment
+
+**Endpoint**: `GET /api/v1/news/social/:symbol`
+
+Returns Reddit and Twitter mentions. **Requires Finnhub API key.**
+
+---
+
+### Get Insider Transactions
+
+**Endpoint**: `GET /api/v1/news/insider/:symbol`
+
+Returns insider trading activity. **Requires Finnhub API key.**
+
+---
+
+### Get Institutional Ownership
+
+**Endpoint**: `GET /api/v1/news/institutional/:symbol`
+
+Returns institutional holdings. **Requires Finnhub API key.**
+
+---
+
+### Get Market Status
+
+**Endpoint**: `GET /api/v1/news/market-status`
+
+**Query Parameters**:
+- `exchange`: Exchange code (default: US)
+
+**Requires Finnhub API key.**
+
+---
+
 ## Caching
 
-Market data endpoints are cached for 5 minutes to reduce API calls and improve performance. Subsequent requests within the cache window will return cached data.
+- Market data endpoints: 5-minute cache
+- Finnhub news endpoints: 2-minute cache
+
+Subsequent requests within the cache window will return cached data.
 
 ## Notes
 
 - All timestamps are in ISO 8601 format (UTC)
 - Decimal values (prices) are returned as strings to preserve precision
 - Symbol parameters are case-insensitive and converted to uppercase
-- The Alpha Vantage free tier allows 500 requests per day
+- The Alpha Vantage free tier allows 25 requests per day (500 with premium)
+- Finnhub free tier allows 60 requests per minute

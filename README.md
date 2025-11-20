@@ -10,11 +10,24 @@ A modern, TypeScript-based backend API for MarketViz - a financial portfolio vis
 
 ## 🚀 Features
 
+### Core Features
 - **Modern TypeScript Stack**: Built with TypeScript, Express, and Prisma ORM
 - **JWT Authentication**: Secure user authentication with JSON Web Tokens
-- **Real-time Stock Data**: Integration with Alpha Vantage API for live market data
 - **Portfolio Management**: Track stocks, transactions, and build watchlists
 - **Smart Caching**: In-memory caching to optimize API calls and reduce costs
+
+### Market Data
+- **Technical Indicators**: RSI, MACD, Bollinger Bands, SMA, EMA, ADX, Stochastic, ATR, OBV
+- **Fundamental Data**: Income statements, balance sheets, cash flow, earnings
+- **Economic Indicators**: GDP, inflation, CPI, unemployment, treasury yields, fed funds rate
+- **Forex Trading**: Exchange rates, daily/intraday/weekly time series
+- **Commodities**: Oil (WTI/Brent), natural gas, metals, agricultural
+
+### News & Sentiment
+- **AlphaVantage News**: Market news with sentiment analysis
+- **Finnhub Integration**: Real-time breaking news, social sentiment, insider trading
+
+### Developer Experience
 - **Input Validation**: Comprehensive request validation using Zod
 - **Error Handling**: Centralized error handling with custom error classes
 - **Rate Limiting**: Built-in rate limiting to protect against abuse
@@ -68,9 +81,14 @@ JWT_SECRET=your_jwt_secret_here_min_32_characters_long
 # Alpha Vantage API
 ALPHA_VANTAGE_API_KEY=your_api_key_here
 
+# Finnhub API (optional - for breaking news)
+FINNHUB_API_KEY=your_finnhub_key_here
+
 # CORS Configuration
 CORS_ORIGIN=http://localhost:3001,http://localhost:3000
 ```
+
+> **Note**: Get a free Finnhub API key at [finnhub.io](https://finnhub.io) (60 calls/min free tier). If not configured, news endpoints fall back to AlphaVantage.
 
 4. **Set up the database**
 
@@ -227,67 +245,62 @@ Authorization: Bearer <your_jwt_token>
 
 ### Market Data Routes
 
-#### Get Stock Quote
+#### Core Data
+- `GET /market/quote/:symbol` - Real-time stock quote
+- `GET /market/daily/:symbol` - Daily time series
+- `GET /market/intraday/:symbol` - Intraday data
+- `GET /market/search?q=apple` - Symbol search
+- `GET /market/overview/:symbol` - Company overview
+- `GET /market/top-movers` - Top gainers/losers
+- `GET /market/news` - Market news with sentiment
+- `GET /market/crypto/:symbol` - Cryptocurrency quote
 
-```http
-GET /market/quote/:symbol
-```
+#### Technical Indicators
+- `GET /market/indicators/:symbol?indicator=RSI` - Any indicator
+- `GET /market/indicators/:symbol/rsi` - RSI
+- `GET /market/indicators/:symbol/macd` - MACD
+- `GET /market/indicators/:symbol/bbands` - Bollinger Bands
+- `GET /market/indicators/:symbol/sma` - Simple Moving Average
+- `GET /market/indicators/:symbol/ema` - Exponential Moving Average
+- `GET /market/indicators/:symbol/adx` - Average Directional Index
+- `GET /market/indicators/:symbol/stoch` - Stochastic Oscillator
+- `GET /market/indicators/:symbol/atr` - Average True Range
+- `GET /market/indicators/:symbol/obv` - On Balance Volume
 
-Example: `GET /market/quote/AAPL`
+#### Fundamental Data
+- `GET /market/fundamentals/:symbol/income` - Income statement
+- `GET /market/fundamentals/:symbol/balance` - Balance sheet
+- `GET /market/fundamentals/:symbol/cashflow` - Cash flow
+- `GET /market/fundamentals/:symbol/earnings` - Earnings data
+- `GET /market/calendar/earnings` - Earnings calendar
+- `GET /market/calendar/ipo` - IPO calendar
 
-#### Get Daily Time Series
+#### Forex
+- `GET /market/forex/rate?from=EUR&to=USD` - Exchange rate
+- `GET /market/forex/daily?from=EUR&to=USD` - Daily forex
+- `GET /market/forex/intraday?from=EUR&to=USD` - Intraday forex
+- `GET /market/forex/weekly?from=EUR&to=USD` - Weekly forex
 
-```http
-GET /market/daily/:symbol?outputsize=compact
-```
+#### Commodities
+- `GET /market/commodities/:commodity` - WTI, BRENT, NATURAL_GAS, COPPER, etc.
 
-Query parameters:
-- `outputsize`: `compact` (100 data points) or `full` (20+ years)
+### Economic Indicators Routes
+- `GET /economic/gdp` - Real GDP
+- `GET /economic/treasury-yield` - Treasury yields
+- `GET /economic/federal-funds-rate` - Fed funds rate
+- `GET /economic/cpi` - Consumer Price Index
+- `GET /economic/inflation` - Inflation rate
+- `GET /economic/unemployment` - Unemployment rate
+- `GET /economic/retail-sales` - Retail sales
+- `GET /economic/nonfarm-payroll` - Nonfarm payroll
 
-#### Get Intraday Data
-
-```http
-GET /market/intraday/:symbol?interval=5min
-```
-
-Query parameters:
-- `interval`: `1min`, `5min`, `15min`, `30min`, `60min`
-
-#### Search Symbols
-
-```http
-GET /market/search?q=apple
-```
-
-#### Get Company Overview
-
-```http
-GET /market/overview/:symbol
-```
-
-#### Get Top Gainers/Losers
-
-```http
-GET /market/top-movers
-```
-
-#### Get Market News
-
-```http
-GET /market/news?tickers=AAPL,GOOGL&limit=50
-```
-
-Query parameters:
-- `tickers`: Comma-separated stock symbols (optional)
-- `limit`: Number of articles (default: 50)
-
-#### Get Cryptocurrency Quote
-
-```http
-GET /market/crypto/:symbol?market=USD
-```
-
-Example: `GET /market/crypto/BTC?market=USD`
+### News Routes (Finnhub + AlphaVantage)
+- `GET /news/market` - Breaking market news
+- `GET /news/company/:symbol` - Company-specific news
+- `GET /news/sentiment/:symbol` - News sentiment
+- `GET /news/social/:symbol` - Social media sentiment
+- `GET /news/insider/:symbol` - Insider transactions
+- `GET /news/institutional/:symbol` - Institutional ownership
 
 ### Health Check
 
@@ -359,9 +372,12 @@ marketViz_backend/
 │   ├── routes/                # API routes
 │   │   ├── auth.routes.ts
 │   │   ├── market.routes.ts
-│   │   └── watchlist.routes.ts
+│   │   ├── watchlist.routes.ts
+│   │   ├── economic.routes.ts
+│   │   └── news.routes.ts
 │   ├── services/              # Business logic
 │   │   ├── alphaVantage.service.ts
+│   │   ├── finnhub.service.ts
 │   │   ├── auth.service.ts
 │   │   ├── cache.service.ts
 │   │   └── watchlist.service.ts
@@ -416,15 +432,18 @@ marketViz_backend/
 
 ## 🎯 Future Enhancements
 
+- [ ] Stock screener with technical + fundamental filters
+- [ ] Portfolio analytics (Sharpe ratio, Beta, VaR)
+- [ ] Price alerts and notifications
+- [ ] Backtesting engine
 - [ ] WebSocket support for real-time price updates
 - [ ] Redis caching for better performance
-- [ ] Email notifications
 - [ ] Two-factor authentication
-- [ ] Advanced portfolio analytics
 - [ ] GraphQL API
-- [ ] Swagger/OpenAPI documentation
 - [ ] Docker containerization
 - [ ] CI/CD pipeline
+
+See [FEATURE_ROADMAP.md](FEATURE_ROADMAP.md) for detailed feature plans.
 
 ## 📝 License
 
